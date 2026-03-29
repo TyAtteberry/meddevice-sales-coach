@@ -1,0 +1,2294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedDevice Sales Coach</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080b10;
+  --surface: #0e1420;
+  --surface2: #161f30;
+  --surface3: #1d2840;
+  --border: #1e2d45;
+  --border2: #263650;
+  --navy: #0a1628;
+  --teal: #00d4b8;
+  --teal-dim: rgba(0,212,184,0.1);
+  --teal-border: rgba(0,212,184,0.2);
+  --gold: #f5a623;
+  --gold-dim: rgba(245,166,35,0.1);
+  --coral: #ff6b6b;
+  --coral-dim: rgba(255,107,107,0.1);
+  --blue: #4a9eff;
+  --blue-dim: rgba(74,158,255,0.1);
+  --green: #34d399;
+  --purple: #a78bfa;
+  --text: #dce8f5;
+  --text2: #7a9ab8;
+  --text3: #3d5670;
+  --r: 10px;
+  --r-lg: 16px;
+  --r-xl: 24px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100vh;}
+
+/* ── HEADER ── */
+.hdr{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0;z-index:100;}
+.hdr-logo{font-family:'Playfair Display',serif;font-size:17px;letter-spacing:-0.3px;cursor:pointer;}
+.hdr-logo em{color:var(--teal);font-style:italic;}
+.hdr-pill{font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;background:var(--teal-dim);border:1px solid var(--teal-border);color:var(--teal);padding:3px 9px;border-radius:20px;}
+.hdr-tool{margin-left:8px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;}
+.hdr-tool span{color:var(--text);font-weight:600;}
+.hdr-right{margin-left:auto;display:flex;gap:8px;align-items:center;}
+.hdr-btn{background:none;border:1px solid var(--border);color:var(--text2);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.hdr-btn:hover{border-color:var(--teal);color:var(--teal);}
+.hdr-btn.danger:hover{border-color:var(--coral);color:var(--coral);}
+
+/* ── APP BODY ── */
+.app{flex:1;overflow:hidden;display:flex;position:relative;}
+
+/* ── VIEWS ── */
+.view{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;}
+.view.active{display:flex;}
+
+/* ── HOME SCREEN ── */
+.home{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;overflow-y:auto;}
+.home-hero{text-align:center;margin-bottom:56px;}
+.home-title{font-family:'Playfair Display',serif;font-size:42px;line-height:1.15;margin-bottom:12px;}
+.home-title em{color:var(--teal);font-style:italic;}
+.home-sub{font-size:15px;color:var(--text2);max-width:500px;margin:0 auto;line-height:1.7;}
+.tool-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:960px;width:100%;}
+.tool-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:32px 28px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;}
+.tool-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.2s;border-radius:var(--r-xl);}
+.tool-card:hover{transform:translateY(-3px);border-color:var(--border2);}
+.tool-card:hover::before{opacity:1;}
+.tc-1::before{background:radial-gradient(ellipse at top left,rgba(0,212,184,0.06),transparent 60%);}
+.tc-2::before{background:radial-gradient(ellipse at top left,rgba(245,166,35,0.06),transparent 60%);}
+.tc-3::before{background:radial-gradient(ellipse at top left,rgba(74,158,255,0.06),transparent 60%);}
+.tc-1:hover{border-color:var(--teal-border);}
+.tc-2:hover{border-color:rgba(245,166,35,0.3);}
+.tc-3:hover{border-color:rgba(74,158,255,0.3);}
+.tool-icon{font-size:32px;margin-bottom:16px;}
+.tool-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;}
+.tc-1 .tool-label{color:var(--teal);}
+.tc-2 .tool-label{color:var(--gold);}
+.tc-3 .tool-label{color:var(--blue);}
+.tool-name{font-family:'Playfair Display',serif;font-size:20px;margin-bottom:10px;line-height:1.2;}
+.tool-desc{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:20px;}
+.tool-features{display:flex;flex-direction:column;gap:5px;margin-bottom:24px;}
+.tf{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:6px;}
+.tf::before{content:'→';color:inherit;font-size:10px;}
+.tc-1 .tf{color:rgba(0,212,184,0.6);}
+.tc-2 .tf{color:rgba(245,166,35,0.6);}
+.tc-3 .tf{color:rgba(74,158,255,0.6);}
+.tool-cta{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:9px 18px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.tc-1 .tool-cta{background:var(--teal);color:var(--bg);}
+.tc-2 .tool-cta{background:var(--gold);color:#1a0e00;}
+.tc-3 .tool-cta{background:var(--blue);color:white;}
+.tool-cta:hover{filter:brightness(1.1);transform:translateY(-1px);}
+.tool-badge{position:absolute;top:16px;right:16px;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:20px;}
+.badge-new{background:rgba(0,212,184,0.15);color:var(--teal);border:1px solid var(--teal-border);}
+.badge-beta{background:rgba(245,166,35,0.15);color:var(--gold);border:1px solid rgba(245,166,35,0.3);}
+
+/* ── CHAT LAYOUT (shared) ── */
+.chat-view{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.chat-topbar{padding:12px 24px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.chat-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.av-teal{background:var(--teal-dim);border:1px solid var(--teal-border);}
+.av-gold{background:var(--gold-dim);border:1px solid rgba(245,166,35,0.3);}
+.av-blue{background:var(--blue-dim);border:1px solid rgba(74,158,255,0.3);}
+.av-coral{background:var(--coral-dim);border:1px solid rgba(255,107,107,0.3);}
+.chat-meta-name{font-size:14px;font-weight:600;}
+.chat-meta-sub{font-size:11px;color:var(--text3);}
+.chat-controls{margin-left:auto;display:flex;gap:6px;}
+
+.chat-msgs{flex:1;overflow-y:auto;padding:20px 0;display:flex;flex-direction:column;gap:0;}
+.msg-row{display:flex;gap:10px;padding:6px 28px;max-width:820px;width:100%;}
+.msg-row.self{align-self:flex-end;flex-direction:row-reverse;margin-left:auto;}
+.msg-row-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:2px;}
+.msg-row-body{max-width:72%;}
+.msg-row-from{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);margin-bottom:4px;}
+.msg-row.self .msg-row-from{text-align:right;}
+.msg-bubble{padding:10px 14px;border-radius:12px;font-size:14px;line-height:1.65;border:1px solid var(--border);}
+.msg-bubble.ai{background:var(--surface2);border-top-left-radius:3px;}
+.msg-bubble.self{background:var(--surface3);border-color:var(--border2);border-top-right-radius:3px;}
+.msg-bubble p+p{margin-top:8px;}
+.msg-bubble strong{color:var(--text);}
+.msg-bubble ul{padding-left:16px;}
+.msg-bubble li{margin-bottom:3px;}
+
+.chat-input-zone{border-top:1px solid var(--border);background:var(--surface);padding:12px 24px;flex-shrink:0;}
+.chat-input-row{display:flex;gap:10px;align-items:flex-end;max-width:820px;}
+.chat-input-row textarea{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:10px 14px;font-size:14px;font-family:inherit;outline:none;resize:none;min-height:44px;max-height:120px;line-height:1.5;transition:border-color 0.15s;}
+.chat-input-row textarea:focus{border-color:var(--teal);}
+.chat-hint{font-size:11px;color:var(--text3);margin-bottom:7px;}
+
+/* ── THINKING ── */
+.thinking{display:flex;gap:4px;padding:5px 2px;}
+.thinking span{width:6px;height:6px;border-radius:50%;background:var(--text3);animation:bop 1.2s infinite;}
+.thinking span:nth-child(2){animation-delay:.18s;}
+.thinking span:nth-child(3){animation-delay:.36s;}
+@keyframes bop{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-6px);opacity:1}}
+
+/* ── BUTTONS ── */
+.btn{padding:9px 18px;border-radius:var(--r);border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px;}
+.btn-teal{background:var(--teal);color:var(--bg);}
+.btn-teal:hover{filter:brightness(1.1);transform:translateY(-1px);}
+.btn-teal:disabled{opacity:.35;cursor:not-allowed;transform:none;filter:none;}
+.btn-gold{background:var(--gold);color:#1a0e00;}
+.btn-gold:hover{filter:brightness(1.08);transform:translateY(-1px);}
+.btn-ghost{background:var(--surface2);border:1px solid var(--border);color:var(--text);}
+.btn-ghost:hover{border-color:var(--teal);color:var(--teal);}
+.btn-blue{background:var(--blue);color:white;}
+.btn-blue:hover{filter:brightness(1.1);}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+
+/* ── STAGE PILL ── */
+.stage-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:0.5px;}
+.sp-1{background:rgba(74,158,255,0.12);color:#4a9eff;border:1px solid rgba(74,158,255,0.25);}
+.sp-2{background:rgba(167,139,250,0.12);color:#a78bfa;border:1px solid rgba(167,139,250,0.25);}
+.sp-3{background:rgba(255,107,107,0.12);color:#ff6b6b;border:1px solid rgba(255,107,107,0.25);}
+.sp-4{background:rgba(245,166,35,0.12);color:#f5a623;border:1px solid rgba(245,166,35,0.25);}
+.sp-5{background:rgba(0,212,184,0.12);color:#00d4b8;border:1px solid rgba(0,212,184,0.25);}
+.sp-6{background:rgba(52,211,153,0.12);color:#34d399;border:1px solid rgba(52,211,153,0.25);}
+
+/* ── OUTPUT PANELS ── */
+.output-panel{flex:1;overflow-y:auto;padding:28px 32px;max-width:860px;width:100%;margin:0 auto;}
+.op-title{font-family:'Playfair Display',serif;font-size:26px;margin-bottom:6px;}
+.op-title em{color:var(--teal);font-style:italic;}
+.op-sub{font-size:13px;color:var(--text2);margin-bottom:28px;line-height:1.6;}
+.op-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:14px;overflow:hidden;}
+.op-section-hdr{padding:14px 18px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background 0.15s;}
+.op-section-hdr:hover{background:var(--surface2);}
+.op-section-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.op-section-title{font-weight:700;font-size:14px;flex:1;}
+.op-section-chev{color:var(--text3);font-size:11px;transition:transform 0.2s;}
+.op-section.open .op-section-chev{transform:rotate(180deg);}
+.op-section-body{display:none;padding:0 18px 18px;}
+.op-section.open .op-section-body{display:block;}
+.op-section-body textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:10px 14px;font-size:13px;font-family:inherit;outline:none;resize:vertical;min-height:80px;line-height:1.65;transition:border-color 0.15s;}
+.op-section-body textarea:focus{border-color:var(--teal);}
+.op-hint{font-size:11px;color:var(--text3);margin-bottom:7px;font-style:italic;}
+
+/* ── PODCAST PLAYER ── */
+.podcast-player{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:28px;margin-bottom:16px;}
+.pp-header{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+.pp-art{width:60px;height:60px;border-radius:12px;background:linear-gradient(135deg,var(--teal-dim),var(--blue-dim));border:1px solid var(--teal-border);display:flex;align-items:center;justify-content:center;font-size:24px;}
+.pp-title{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:3px;}
+.pp-sub{font-size:12px;color:var(--text2);}
+.pp-hosts{display:flex;gap:8px;margin-bottom:20px;}
+.pp-host{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;}
+.pp-host-dot{width:8px;height:8px;border-radius:50%;}
+.pp-controls{display:flex;align-items:center;gap:12px;}
+.pp-play{width:48px;height:48px;border-radius:50%;background:var(--teal);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all 0.15s;flex-shrink:0;}
+.pp-play:hover{filter:brightness(1.1);transform:scale(1.05);}
+.pp-progress{flex:1;}
+.pp-bar-bg{height:4px;background:var(--border);border-radius:2px;cursor:pointer;margin-bottom:6px;}
+.pp-bar-fill{height:4px;background:var(--teal);border-radius:2px;width:0%;transition:width 0.3s;}
+.pp-times{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;}
+.pp-script{margin-top:20px;border-top:1px solid var(--border);padding-top:16px;}
+.pp-script-line{padding:8px 12px;border-radius:8px;margin-bottom:4px;font-size:13px;line-height:1.6;transition:background 0.1s;}
+.pp-script-line.active{background:var(--teal-dim);border-left:3px solid var(--teal);}
+.pp-host-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:2px;}
+
+/* ── STAKEHOLDER MAP ── */
+.stakeholder-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:16px;}
+.sk-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;}
+.sk-name{font-weight:700;font-size:14px;margin-bottom:3px;}
+.sk-role{font-size:11px;color:var(--text3);margin-bottom:10px;}
+.sk-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.sk-label{font-size:11px;color:var(--text2);}
+.sk-val{font-size:11px;font-weight:600;}
+.influence-bar{height:4px;background:var(--border);border-radius:2px;margin-top:3px;margin-bottom:8px;}
+.influence-fill{height:4px;border-radius:2px;}
+.sk-tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;margin-top:4px;}
+.tag-blocker{background:rgba(255,107,107,0.12);color:var(--coral);border:1px solid rgba(255,107,107,0.25);}
+.tag-champion{background:rgba(52,211,153,0.12);color:var(--green);border:1px solid rgba(52,211,153,0.25);}
+.tag-neutral{background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal-border);}
+
+/* ── INFO CARDS ── */
+.info-box{background:var(--teal-dim);border:1px solid var(--teal-border);border-radius:var(--r);padding:12px 16px;font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:14px;}
+.info-box strong{color:var(--teal);}
+.warn-box{background:var(--gold-dim);border:1px solid rgba(245,166,35,0.3);border-radius:var(--r);padding:12px 16px;font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:14px;}
+.warn-box strong{color:var(--gold);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* ── PROGRESS BAR ── */
+.intake-progress{padding:8px 28px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;flex-shrink:0;}
+.ip-label{font-size:11px;color:var(--text3);font-weight:600;width:120px;flex-shrink:0;}
+.ip-bar-bg{flex:1;height:4px;background:var(--border);border-radius:2px;}
+.ip-bar-fill{height:4px;border-radius:2px;background:linear-gradient(90deg,var(--teal),#00a896);transition:width 0.4s;}
+.ip-pct{font-size:11px;color:var(--teal);font-weight:600;width:32px;text-align:right;font-family:'IBM Plex Mono',monospace;}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;display:none;align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:36px;max-width:500px;width:90%;}
+.modal-title{font-family:'Playfair Display',serif;font-size:22px;margin-bottom:8px;}
+.modal-title em{color:var(--teal);font-style:italic;}
+.modal-sub{font-size:13px;color:var(--text2);margin-bottom:22px;line-height:1.65;}
+.modal-field{margin-bottom:14px;}
+.modal-field label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--text2);margin-bottom:6px;}
+.modal-field input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:10px 14px;font-size:14px;font-family:inherit;outline:none;transition:border-color 0.15s;}
+.modal-field input:focus{border-color:var(--teal);}
+.modal-note{font-size:11px;color:var(--text3);margin-top:12px;text-align:center;line-height:1.6;}
+.modal-note a{color:var(--teal);text-decoration:none;}
+
+/* ── SOUNDBAR (AI speaking) ── */
+.soundbar{width:3px;border-radius:2px;background:var(--teal);animation:soundbar 0.8s ease-in-out infinite;}
+.s1{height:6px;animation-delay:0s;}
+.s2{height:14px;animation-delay:0.1s;}
+.s3{height:20px;animation-delay:0.2s;}
+.s4{height:14px;animation-delay:0.3s;}
+.s5{height:6px;animation-delay:0.4s;}
+@keyframes soundbar{0%,100%{transform:scaleY(0.4)}50%{transform:scaleY(1)}}
+
+/* ── MIC BUTTON STATES ── */
+#mic-btn.listening{background:var(--coral-dim)!important;border-color:var(--coral)!important;box-shadow:0 0 0 6px rgba(255,107,107,0.15);animation:mic-pulse 1s ease-in-out infinite;}
+#mic-btn.processing{background:var(--gold-dim)!important;border-color:var(--gold)!important;}
+@keyframes mic-pulse{0%,100%{box-shadow:0 0 0 6px rgba(255,107,107,0.15)}50%{box-shadow:0 0 0 12px rgba(255,107,107,0.05)}}
+.voice-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:4px;}
+.voice-card{background:var(--surface2);border:2px solid var(--border);border-radius:8px;padding:10px 8px;cursor:pointer;text-align:center;transition:all 0.15s;}
+.voice-card:hover{border-color:var(--teal);}
+.voice-card.sel{border-color:var(--teal);background:var(--teal-dim);}
+.voice-card.sel::after{content:'✓';display:block;font-size:10px;color:var(--teal);font-weight:700;}
+.vc-emoji{font-size:20px;margin-bottom:4px;}
+.vc-name{font-size:11px;font-weight:600;color:var(--text);}
+.vc-style{font-size:10px;color:var(--text3);margin-top:2px;}
+@keyframes slideup{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* ── ACCOUNT CARDS ── */
+.acct-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;cursor:pointer;transition:all 0.2s;position:relative;}
+.acct-card:hover{border-color:var(--teal-border);transform:translateY(-2px);}
+.acct-card-name{font-family:'Playfair Display',serif;font-size:17px;margin-bottom:4px;}
+.acct-card-meta{font-size:12px;color:var(--text3);margin-bottom:12px;}
+.acct-card-last{font-size:12px;color:var(--text2);margin-bottom:8px;}
+.acct-card-next{font-size:12px;padding:5px 10px;border-radius:6px;background:var(--gold-dim);color:var(--gold);border:1px solid rgba(245,166,35,0.2);display:inline-block;}
+.acct-type-badge{position:absolute;top:14px;right:14px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--surface2);color:var(--text3);border:1px solid var(--border);}
+.acct-type-btn{padding:8px;border-radius:8px;border:1px solid var(--border);cursor:pointer;text-align:center;font-size:12px;font-weight:600;color:var(--text2);transition:all 0.15s;}
+.acct-type-btn:hover{border-color:var(--teal);color:var(--teal);}
+.acct-type-btn.active{border-color:var(--teal);background:var(--teal-dim);color:var(--teal);}
+.call-entry{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;}
+.call-entry-hdr{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.call-entry-type{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:2px 8px;border-radius:20px;}
+.ce-prep{background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal-border);}
+.ce-postcall{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(74,158,255,0.3);}
+.call-entry-date{font-size:11px;color:var(--text3);margin-left:auto;}
+.call-entry-summary{font-size:13px;color:var(--text2);line-height:1.6;}
+.sk-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--surface2);border:1px solid var(--border);color:var(--text2);}
+
+/* ── EMAIL CARDS ── */
+.email-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:16px;overflow:hidden;}
+.email-card-hdr{padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
+.email-card-title{font-weight:700;font-size:14px;flex:1;}
+.email-card-tag{font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;}
+.email-body{padding:18px;font-size:14px;line-height:1.8;color:var(--text2);white-space:pre-wrap;font-family:'IBM Plex Sans',sans-serif;}
+.copy-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text2);padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;display:inline-flex;align-items:center;gap:5px;}
+.copy-btn:hover{border-color:var(--teal);color:var(--teal);}
+.copy-btn.copied{border-color:var(--green);color:var(--green);}
+.sf-block{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;font-size:13px;font-family:'IBM Plex Mono',monospace;color:var(--text2);white-space:pre-wrap;line-height:1.6;}
+.score-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;margin-bottom:12px;}
+.score-block h3{font-size:13px;font-weight:700;margin-bottom:12px;}
+.srow{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.srow-lbl{font-size:12px;color:var(--text2);width:180px;flex-shrink:0;}
+.srow-bg{flex:1;height:4px;background:var(--border);border-radius:2px;}
+.srow-fill{height:4px;border-radius:2px;background:linear-gradient(90deg,var(--teal),#00a896);}
+.srow-val{font-size:12px;font-weight:700;color:var(--teal);width:30px;text-align:right;font-family:'IBM Plex Mono',monospace;}
+.big-score{font-family:'Playfair Display',serif;font-size:56px;color:var(--teal);line-height:1;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-logo" onclick="goHome()">MedDevice <em>Sales Coach</em></div>
+  <div class="hdr-pill">AI Platform</div>
+  <div class="hdr-tool" id="hdr-tool-label" style="display:none;">
+    <span style="color:var(--text3)">›</span>
+    <span id="hdr-tool-name"></span>
+  </div>
+  <div class="hdr-right">
+    <button class="hdr-btn" onclick="goHome()" id="btn-home" style="display:none;">← Home</button>
+    <button class="hdr-btn danger" onclick="confirmClear()" id="btn-clear" style="display:none;">↺ New Session</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app">
+
+  <!-- ══ HOME ══ -->
+  <div class="view active" id="view-home">
+    <div class="home" style="align-items:stretch;padding:0;">
+      <div style="padding:24px 32px 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:22px;">Your <em style="color:var(--teal);font-style:italic;">Accounts</em></div>
+          <div style="font-size:12px;color:var(--text3);margin-top:3px;" id="home-rep-sub">Loading...</div>
+        </div>
+        <button class="btn btn-teal" onclick="showNewAccountModal()" style="gap:8px;">
+          <span style="font-size:18px;line-height:1;">+</span> New Account
+        </button>
+      </div>
+      <div id="accounts-list" style="flex:1;overflow-y:auto;padding:20px 32px 32px;">
+        <div id="accounts-empty" style="display:none;text-align:center;padding:60px 20px;">
+          <div style="font-size:48px;margin-bottom:16px;">🏥</div>
+          <div style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:8px;">No accounts yet</div>
+          <div style="font-size:14px;color:var(--text2);margin-bottom:24px;line-height:1.7;">Add your first account to start preparing calls,<br>tracking conversations, and building insights.</div>
+          <button class="btn btn-teal" onclick="showNewAccountModal()">+ Add Your First Account</button>
+        </div>
+        <div id="accounts-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ACCOUNT DETAIL ══ -->
+  <div class="view" id="view-account">
+    <div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
+      <div style="padding:16px 24px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;" onclick="goHome()">← Accounts</button>
+          <div style="flex:1;">
+            <div style="font-family:'Playfair Display',serif;font-size:18px;" id="acct-detail-name">Account</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:1px;" id="acct-detail-sub"></div>
+          </div>
+          <button class="btn btn-teal" style="font-size:12px;padding:7px 16px;" onclick="startCallPrepForAccount()">🎙 Prep a Call</button>
+          <button class="btn btn-blue" style="font-size:12px;padding:7px 16px;" onclick="startPostCallForAccount()">📋 Log a Call</button>
+        </div>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:20px 24px;" id="acct-history">
+        <div id="acct-history-empty" style="text-align:center;padding:40px 20px;display:none;">
+          <div style="font-size:36px;margin-bottom:12px;">📞</div>
+          <div style="font-size:14px;color:var(--text2);">No call history yet.<br>Prep your first call to get started.</div>
+        </div>
+        <div id="acct-history-list"></div>
+      </div>
+      <div id="acct-stakeholders" style="border-top:1px solid var(--border);background:var(--surface);padding:12px 24px;flex-shrink:0;display:none;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:8px;">Key Contacts</div>
+        <div id="acct-stakeholders-list" style="display:flex;gap:10px;flex-wrap:wrap;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TOOL 1: PRE-CALL PLANNER ══ -->
+  <div class="view" id="view-precall">
+
+    <!-- 1A: INTAKE CHAT -->
+    <div class="view active" id="pv-intake" style="position:relative;">
+      <div class="chat-topbar">
+        <div class="chat-av av-teal">🧠</div>
+        <div>
+          <div class="chat-meta-name">Account Intelligence</div>
+          <div class="chat-meta-sub" id="intake-phase-label">Gathering account information</div>
+        </div>
+        <div class="chat-controls">
+          <div id="stage-toggle-wrap" style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);">
+            <span>Show stages</span>
+            <div id="stage-toggle" onclick="toggleStageViz()" style="width:36px;height:20px;background:var(--border);border-radius:20px;cursor:pointer;position:relative;transition:background 0.2s;">
+              <div id="stage-knob" style="width:16px;height:16px;border-radius:50%;background:var(--text3);position:absolute;top:2px;left:2px;transition:all 0.2s;"></div>
+            </div>
+          </div>
+          <div id="current-stage-pill" style="display:none;"></div>
+        </div>
+      </div>
+      <div class="intake-progress">
+        <div class="ip-label" id="ip-label">Account Basics</div>
+        <div class="ip-bar-bg"><div class="ip-bar-fill" id="ip-fill" style="width:5%"></div></div>
+        <div class="ip-pct" id="ip-pct">5%</div>
+      </div>
+      <div class="chat-msgs" id="intake-msgs"></div>
+      <div class="chat-input-zone" id="intake-input-zone">
+        <div style="display:flex;align-items:center;gap:14px;max-width:820px;">
+          <button id="mic-btn" onclick="startListening('intake')"
+            style="width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--surface2);border:2px solid var(--border);transition:all 0.15s;flex-shrink:0;"
+            title="Tap to speak">🎤</button>
+          <div style="flex:1;">
+            <div id="voice-status" style="font-size:12px;color:var(--text3);margin-bottom:5px;">Tap 🎤 to speak — auto-sends when you pause</div>
+            <div style="display:flex;gap:8px;align-items:flex-end;">
+              <textarea id="intake-input" rows="1" placeholder="Or type here..." onkeydown="handleIntakeEnter(event)" style="min-height:36px;max-height:80px;flex:1;"></textarea>
+              <button class="btn btn-teal" onclick="sendIntakeMsg()" style="padding:8px 14px;font-size:13px;">Send</button>
+              <button class="btn btn-gold" id="btn-generate" style="display:none;padding:8px 14px;font-size:13px;" onclick="generateOutputs()">Generate →</button>
+            </div>
+          </div>
+          <div id="ai-speaking" style="display:none;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+            <div style="display:flex;gap:3px;align-items:flex-end;height:20px;">
+              <div class="soundbar s1"></div><div class="soundbar s2"></div>
+              <div class="soundbar s3"></div><div class="soundbar s4"></div>
+              <div class="soundbar s5"></div>
+            </div>
+            <div style="font-size:9px;color:var(--teal);font-weight:600;letter-spacing:0.5px;">SPEAKING</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1B: OUTPUTS -->
+    <div class="view" id="pv-outputs" style="position:relative;">
+      <div class="chat-topbar">
+        <div class="chat-av av-gold">🎙️</div>
+        <div>
+          <div class="chat-meta-name" id="podcast-account-name">Account Brief</div>
+          <div class="chat-meta-sub">AI Podcast · Stakeholder Map · Pre-Call Plan</div>
+        </div>
+        <div class="chat-controls">
+          <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px;" onclick="showPrecallView('intake')">← Edit Intake</button>
+          <button class="btn btn-teal" style="font-size:12px;padding:6px 12px;" onclick="showPrecallView('roleplay')">Practice Role-Play →</button>
+        </div>
+      </div>
+      <div class="output-panel" id="output-panel">
+        <div class="thinking" style="padding:24px 0;"><span></span><span></span><span></span></div>
+        <p style="font-size:13px;color:var(--text3);margin-top:8px;">Generating your account brief, podcast, and stakeholder map...</p>
+      </div>
+    </div>
+
+    <!-- 1C: ROLE-PLAY -->
+    <div class="view" id="pv-roleplay" style="position:relative;">
+      <div class="chat-topbar">
+        <div class="chat-av av-coral">👨‍⚕️</div>
+        <div>
+          <div class="chat-meta-name" id="rp-dr-name">Dr. ——</div>
+          <div class="chat-meta-sub" id="rp-dr-sub">——</div>
+        </div>
+        <div class="chat-controls">
+          <div id="rp-stage-pill"></div>
+          <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px;" id="btn-coaching-rp" onclick="toggleRpCoaching()">💡 Coaching On</button>
+          <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px;" onclick="showPrecallView('outputs')">📋 Brief</button>
+          <button class="btn btn-teal" style="font-size:12px;padding:6px 12px;" onclick="showDebrief()">📊 End & Score</button>
+        </div>
+      </div>
+      <div class="chat-msgs" id="rp-msgs"></div>
+      <div class="chat-input-zone" id="rp-input-zone">
+        <div style="display:flex;align-items:center;gap:14px;max-width:820px;">
+          <button id="rp-mic-btn" onclick="startListening('roleplay')"
+            style="width:56px;height:56px;border-radius:50%;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--surface2);transition:all 0.15s;flex-shrink:0;"
+            title="Tap to speak">🎤</button>
+          <div style="flex:1;">
+            <div id="rp-voice-status" style="font-size:12px;color:var(--text3);margin-bottom:5px;">Tap 🎤 to speak as the rep — auto-sends when you pause</div>
+            <div style="display:flex;gap:8px;align-items:flex-end;">
+              <textarea id="rp-input" rows="1" placeholder="Or type here..." onkeydown="handleRpEnter(event)" style="min-height:36px;max-height:80px;flex:1;"></textarea>
+              <button class="btn btn-teal" onclick="sendRpMsg()" style="padding:8px 14px;font-size:13px;">Send</button>
+            </div>
+          </div>
+          <div id="rp-ai-speaking" style="display:none;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+            <div style="display:flex;gap:3px;align-items:flex-end;height:20px;">
+              <div class="soundbar s1"></div><div class="soundbar s2"></div>
+              <div class="soundbar s3"></div><div class="soundbar s4"></div>
+              <div class="soundbar s5"></div>
+            </div>
+            <div style="font-size:9px;color:var(--coral);font-weight:600;letter-spacing:0.5px;">DR. SPEAKING</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1D: DEBRIEF -->
+    <div class="view" id="pv-debrief" style="position:relative;overflow-y:auto;">
+      <div class="output-panel">
+        <div class="op-title">Session <em>Debrief</em></div>
+        <div class="op-sub">Challenger execution analysis — how well you moved through the 6 stages</div>
+        <div id="debrief-content"><div class="thinking"><span></span><span></span><span></span></div></div>
+        <div class="btn-row" style="margin-top:16px;">
+          <button class="btn btn-teal" onclick="showPrecallView('roleplay')">↩ Try Again</button>
+          <button class="btn btn-ghost" onclick="showPrecallView('outputs')">← Back to Brief</button>
+          <button class="btn btn-blue" onclick="generatePostCall()">📋 Generate Post-Call Summary</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /view-precall -->
+
+  <!-- ══ TOOL 3: POST-CALL SUMMARY ══ -->
+  <div class="view" id="view-postcall">
+    <div class="view active" id="pcv-chat" style="position:relative;">
+      <div class="chat-topbar">
+        <div class="chat-av av-blue">📋</div>
+        <div>
+          <div class="chat-meta-name">Post-Call Debrief</div>
+          <div class="chat-meta-sub">Tell me how the call went — I'll handle the write-up</div>
+        </div>
+        <div class="chat-controls">
+          <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px;" onclick="goHome()">← Home</button>
+          <button class="btn btn-blue" style="font-size:12px;padding:6px 12px;display:none;" id="btn-gen-outputs" onclick="generatePostCallOutputs()">✉ Generate Emails & Summary →</button>
+        </div>
+      </div>
+      <div class="chat-msgs" id="postcall-msgs"></div>
+      <div class="chat-input-zone">
+        <div style="display:flex;align-items:center;gap:14px;max-width:820px;">
+          <button id="pc-mic-btn" onclick="startListening('postcall')"
+            style="width:56px;height:56px;border-radius:50%;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--surface2);transition:all 0.15s;flex-shrink:0;">🎤</button>
+          <div style="flex:1;">
+            <div id="pc-voice-status" style="font-size:12px;color:var(--text3);margin-bottom:5px;">Tap 🎤 to speak — auto-sends when you pause</div>
+            <div style="display:flex;gap:8px;align-items:flex-end;">
+              <textarea id="postcall-input" rows="1" placeholder="Or type here..." onkeydown="handlePostCallEnter(event)" style="min-height:36px;max-height:80px;flex:1;"></textarea>
+              <button class="btn btn-blue" onclick="sendPostCallMsg()" style="padding:8px 14px;">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="view" id="pcv-outputs" style="position:relative;overflow-y:auto;">
+      <div class="output-panel">
+        <div class="op-title">Post-Call <em>Outputs</em></div>
+        <div class="op-sub">Copy and use — everything is tailored to this clinician and what matters to them</div>
+        <div id="pc-outputs-body"><div class="thinking"><span></span><span></span><span></span></div></div>
+        <div class="btn-row" style="margin-top:16px;">
+          <button class="btn btn-ghost" onclick="showPcView('chat')">← Back to Debrief</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- PASSWORD MODAL -->
+<div class="modal-overlay show" id="modal-password">
+  <div class="modal-box" style="max-width:400px;text-align:center;">
+    <div style="font-size:36px;margin-bottom:12px;">🩺</div>
+    <div class="modal-title" style="justify-content:center;">MedDevice <em>Sales Coach</em></div>
+    <div class="modal-sub" style="margin-top:8px;">Enter the access code to continue.</div>
+    <div class="modal-field" style="margin-top:20px;text-align:left;">
+      <label>Access Code</label>
+      <input type="password" id="password-input" placeholder="Enter code..."
+        onkeydown="if(event.key==='Enter') checkPassword()"
+        style="letter-spacing:3px;font-size:18px;text-align:center;">
+    </div>
+    <div id="password-error" style="color:var(--coral);font-size:12px;margin-bottom:8px;display:none;">Incorrect code — try again</div>
+    <button class="btn btn-teal" onclick="checkPassword()" style="width:100%;justify-content:center;">Enter →</button>
+    <div style="font-size:11px;color:var(--text3);margin-top:16px;">Beta feedback program · Contact Ty for access</div>
+  </div>
+</div>
+
+<!-- NEW ACCOUNT MODAL -->
+<div class="modal-overlay" id="modal-new-account">
+  <div class="modal-box" style="max-width:460px;">
+    <div style="font-size:32px;margin-bottom:12px;text-align:center;">🏥</div>
+    <div class="modal-title" style="text-align:center;">Add an <em>Account</em></div>
+    <div class="modal-sub" style="text-align:center;">Just the basics — everything else gets built through your conversations.</div>
+    <div class="modal-field">
+      <label>Account Name <span style="color:var(--coral);">*</span></label>
+      <input type="text" id="new-acct-name" placeholder="e.g. Duke University Medical Center" autocomplete="off">
+    </div>
+    <div class="modal-field">
+      <label>Account Type</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px;">
+        <div class="acct-type-btn active" id="atype-hospital" onclick="selectAcctType('hospital')">🏥 Hospital</div>
+        <div class="acct-type-btn" id="atype-clinic" onclick="selectAcctType('clinic')">🏢 Clinic</div>
+        <div class="acct-type-btn" id="atype-practice" onclick="selectAcctType('practice')">👨‍⚕️ Practice</div>
+      </div>
+    </div>
+    <div class="modal-field">
+      <label>City / Location <span style="color:var(--text3);font-weight:400;">Optional</span></label>
+      <input type="text" id="new-acct-location" placeholder="e.g. Durham, NC">
+    </div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn btn-ghost" onclick="closeNewAccountModal()" style="flex:1;justify-content:center;">Cancel</button>
+      <button class="btn btn-teal" onclick="createAccount()" style="flex:2;justify-content:center;">Create Account →</button>
+    </div>
+    <div id="new-acct-error" style="color:var(--coral);font-size:12px;margin-top:8px;display:none;">Please enter an account name.</div>
+  </div>
+</div>
+
+<!-- REP PROFILE MODAL -->
+<div class="modal-overlay" id="modal-profile">
+  <div class="modal-box" style="max-width:520px;">
+    <div style="font-size:32px;margin-bottom:12px;text-align:center;">👤</div>
+    <div class="modal-title" style="text-align:center;">Set Up Your <em>Profile</em></div>
+    <div class="modal-sub" style="text-align:center;">This helps personalize every coaching session to your products and customers. Takes 60 seconds.</div>
+    <div class="modal-field">
+      <label>Your Name</label>
+      <input type="text" id="profile-name" placeholder="e.g. Ty Atteberry" autocomplete="name">
+    </div>
+    <div class="modal-field">
+      <label>Company</label>
+      <input type="text" id="profile-company" placeholder="e.g. Abbott, Medtronic, Boston Scientific">
+    </div>
+    <div class="modal-field">
+      <label>Products You Sell</label>
+      <input type="text" id="profile-products" placeholder="e.g. BioSense DBS System, Infinity SCS">
+      <div style="font-size:11px;color:var(--text3);margin-top:4px;">Separate multiple products with commas</div>
+    </div>
+    <div class="modal-field">
+      <label>Specialties You Call On</label>
+      <input type="text" id="profile-specialties" placeholder="e.g. Neurosurgery, Movement Disorder Neurology">
+      <div style="font-size:11px;color:var(--text3);margin-top:4px;">The clinical specialties in your territory</div>
+    </div>
+    <div class="modal-field">
+      <label>Territory <span style="color:var(--text3);font-weight:400;">Optional</span></label>
+      <input type="text" id="profile-territory" placeholder="e.g. Southeast, NC/SC/VA">
+    </div>
+    <div style="height:1px;background:var(--border);margin:16px 0;"></div>
+    <div class="modal-field">
+      <label>Email Address <span style="color:var(--text3);font-weight:400;">Optional — for reminders</span></label>
+      <input type="email" id="profile-email" placeholder="e.g. ty@company.com">
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;cursor:pointer;" onclick="document.getElementById('profile-notify').click()">
+      <input type="checkbox" id="profile-notify" style="margin-top:3px;accent-color:var(--teal);width:16px;height:16px;flex-shrink:0;">
+      <div>
+        <div style="font-size:13px;color:var(--text);font-weight:500;">Send me follow-up reminders</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">Get nudged when accounts need attention or follow-ups are due</div>
+      </div>
+    </div>
+    <button class="btn btn-teal" onclick="saveProfile()" style="width:100%;justify-content:center;margin-top:8px;">Save & Start Coaching →</button>
+    <div id="profile-error" style="color:var(--coral);font-size:12px;margin-top:8px;display:none;">Please enter your name and at least one product.</div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════
+const CONFIG = {
+  API_URL:  'https://meddevice-coach-api-production.up.railway.app',
+  VOICE1: '21m00Tcm4TlvDq8ikWAM',  // Rachel — AI Coach voice
+  VOICE2: 'pNInz6obpgDQGcFmaJgB',  // Adam   — Clinician voice
+  PASSWORD: 'MedCoach2026',
+};
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+const S = {
+  sessionToken: '',
+  keys: {
+    voice1: CONFIG.VOICE1,
+    voice2: CONFIG.VOICE2,
+  },
+  rep: { name:'', company:'', products:'', specialties:'', territory:'' },
+  intakeMsgs: [],
+  intakeData: {},
+  stakeholders: [],
+  outputGenerated: false,
+  podcastScript: [],
+  podcastAudio: [],
+  podcastAudioReady: 0,
+  podcastPlaying: false,
+  podcastIdx: 0,
+  brief: {},
+  rpMsgs: [],
+  rpStage: 1,
+  rpCoachingOn: true,
+  stageVizOn: false,
+  rpDrName: '',
+  postcallMsgs: [],
+  postcallData: {},
+};
+
+const STAGES = [
+  { num:1, name:'Credibility Builder', cls:'sp-1' },
+  { num:2, name:'The Reframe',         cls:'sp-2' },
+  { num:3, name:'Rational Drowning',   cls:'sp-3' },
+  { num:4, name:'Emotional Impact',    cls:'sp-4' },
+  { num:5, name:'New Way Forward',     cls:'sp-5' },
+  { num:6, name:'The Solution',        cls:'sp-6' },
+];
+
+const INTAKE_PHASES = [
+  { label:'Account Basics',    pct:5  },
+  { label:'Stakeholders',      pct:25 },
+  { label:'Influence & Wins',  pct:45 },
+  { label:'History & Products',pct:65 },
+  { label:'Objections',        pct:82 },
+  { label:'Call Strategy',     pct:95 },
+];
+
+// ══════════════════════════════════════════════
+// ACCOUNT MANAGEMENT
+// ══════════════════════════════════════════════
+function getAccounts() {
+  try { return JSON.parse(sessionStorage.getItem('mdsc_accounts') || '[]'); } catch(e) { return []; }
+}
+function saveAccounts(accounts) {
+  sessionStorage.setItem('mdsc_accounts', JSON.stringify(accounts));
+}
+function getAccount(id) {
+  return getAccounts().find(a => a.id === id) || null;
+}
+function upsertAccount(account) {
+  const accounts = getAccounts();
+  const idx = accounts.findIndex(a => a.id === account.id);
+  if(idx >= 0) accounts[idx] = account;
+  else accounts.unshift(account);
+  saveAccounts(accounts);
+}
+
+let S_accountId = null;
+
+function renderHome() {
+  const accounts = getAccounts();
+  const sub = document.getElementById('home-rep-sub');
+  if(sub) sub.textContent = S.rep?.name ? `${S.rep.name} · ${S.rep.company||''}` : 'Set up your profile to personalize coaching';
+
+  const grid = document.getElementById('accounts-grid');
+  const empty = document.getElementById('accounts-empty');
+
+  if(!accounts.length) {
+    grid.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  grid.style.display = 'grid';
+  empty.style.display = 'none';
+
+  grid.innerHTML = accounts.map(a => {
+    const lastCall = a.calls?.[a.calls.length - 1];
+    const lastDate = lastCall ? new Date(lastCall.date).toLocaleDateString('en-US', {month:'short', day:'numeric'}) : null;
+    const callCount = a.calls?.length || 0;
+    return `
+      <div class="acct-card">
+        <div class="acct-type-badge">${a.type === 'hospital' ? '🏥' : a.type === 'clinic' ? '🏢' : '👨‍⚕️'} ${a.type||'account'}</div>
+        <div class="acct-card-name" onclick="openAccount('${a.id}')" style="cursor:pointer;">${esc(a.name)}</div>
+        <div class="acct-card-meta">${esc(a.location||'')}${a.location && callCount ? ' · ' : ''}${callCount ? callCount + ' call' + (callCount !== 1 ? 's' : '') : 'No calls yet'}</div>
+        ${lastDate ? `<div class="acct-card-last">Last activity: ${lastDate}</div>` : ''}
+        ${a.nextStep ? `<div class="acct-card-next">→ ${esc(a.nextStep)}</div>` : ''}
+        <div style="display:flex;gap:8px;margin-top:14px;">
+          <button class="btn btn-teal" style="flex:1;justify-content:center;font-size:12px;padding:7px 10px;" onclick="quickPrepCall('${a.id}')">🎙 Prep Call</button>
+          <button class="btn btn-blue" style="flex:1;justify-content:center;font-size:12px;padding:7px 10px;" onclick="quickPostCall('${a.id}')">📋 Log Call</button>
+          <button class="btn btn-ghost" style="font-size:12px;padding:7px 12px;" onclick="openAccount('${a.id}')" title="View history">📂</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function openAccount(id) {
+  S_accountId = id;
+  const account = getAccount(id);
+  if(!account) return;
+  document.getElementById('acct-detail-name').textContent = account.name;
+  document.getElementById('acct-detail-sub').textContent = [account.type, account.location].filter(Boolean).join(' · ');
+  renderAccountHistory(account);
+  renderAccountStakeholders(account);
+  showView('view-account');
+  document.getElementById('hdr-tool-name') && (document.getElementById('hdr-tool-name').textContent = account.name);
+  document.getElementById('btn-home').style.display = 'block';
+  document.getElementById('btn-clear').style.display = 'block';
+  document.getElementById('hdr-tool-label').style.display = 'flex';
+}
+
+function renderAccountHistory(account) {
+  const list = document.getElementById('acct-history-list');
+  const empty = document.getElementById('acct-history-empty');
+  const calls = account.calls || [];
+  if(!calls.length) { empty.style.display = 'block'; list.innerHTML = ''; return; }
+  empty.style.display = 'none';
+  list.innerHTML = [...calls].reverse().map((call, i) => {
+    const date = new Date(call.date).toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'});
+    const isPrep = call.type === 'prep';
+    return `
+      <div class="call-entry">
+        <div class="call-entry-hdr">
+          <span class="call-entry-type ${isPrep ? 'ce-prep' : 'ce-postcall'}">${isPrep ? '🎙 Call Prep' : '📋 Post-Call'}</span>
+          <span class="call-entry-date">${date}</span>
+        </div>
+        <div class="call-entry-summary">${esc(call.summary || 'No summary')}</div>
+        ${call.nextStep ? `<div style="margin-top:8px;font-size:12px;color:var(--gold);">→ Next step: ${esc(call.nextStep)}</div>` : ''}
+        ${isPrep && call.hasBrief ? `<button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;margin-top:8px;" onclick="loadCallPrep('${account.id}',${calls.length - 1 - i})">Load This Brief</button>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function renderAccountStakeholders(account) {
+  const strip = document.getElementById('acct-stakeholders');
+  const list = document.getElementById('acct-stakeholders-list');
+  const stakeholders = account.stakeholders || [];
+  if(!stakeholders.length) { strip.style.display = 'none'; return; }
+  strip.style.display = 'block';
+  list.innerHTML = stakeholders.map(sk => `
+    <div class="sk-chip">
+      <span>${esc(sk.name)}</span>
+      <span style="color:var(--text3);">${esc(sk.title||sk.persona||'')}</span>
+    </div>`).join('');
+}
+
+let selectedAcctType = 'hospital';
+
+function showNewAccountModal() {
+  document.getElementById('new-acct-name').value = '';
+  document.getElementById('new-acct-location').value = '';
+  document.getElementById('new-acct-error').style.display = 'none';
+  selectAcctType('hospital');
+  document.getElementById('modal-new-account').classList.add('show');
+  setTimeout(() => document.getElementById('new-acct-name').focus(), 100);
+}
+
+function closeNewAccountModal() {
+  document.getElementById('modal-new-account').classList.remove('show');
+}
+
+function selectAcctType(type) {
+  selectedAcctType = type;
+  ['hospital','clinic','practice'].forEach(t => {
+    document.getElementById('atype-'+t).classList.toggle('active', t === type);
+  });
+}
+
+function createAccount() {
+  const name = document.getElementById('new-acct-name').value.trim();
+  if(!name) { document.getElementById('new-acct-error').style.display = 'block'; return; }
+  const account = {
+    id: 'acct_' + Date.now(), name,
+    type: selectedAcctType,
+    location: document.getElementById('new-acct-location').value.trim(),
+    createdAt: Date.now(), calls: [], stakeholders: [], nextStep: '',
+  };
+  upsertAccount(account);
+  closeNewAccountModal();
+  openAccount(account.id);
+}
+
+function quickPrepCall(accountId) {
+  S_accountId = accountId;
+  const account = getAccount(accountId);
+  if(!account) return;
+  S.intakeMsgs=[]; S.intakeData={}; S.stakeholders=[];
+  S.brief={}; S.rpMsgs=[]; S.podcastScript=[];
+  S.podcastAudio=[]; S.outputGenerated=false;
+  S.postcallMsgs=[]; S.postcallData={};
+  S.intakeData.accountName = account.name;
+  S.intakeData.hospital = account.location || account.name;
+  if(account.stakeholders?.length) S.stakeholders = account.stakeholders;
+  launchTool('precall');
+}
+
+function quickPostCall(accountId) {
+  S_accountId = accountId;
+  const account = getAccount(accountId);
+  if(!account) return;
+  S.postcallMsgs=[]; S.postcallData={};
+  S.intakeData.accountName = account.name;
+  if(account.stakeholders?.length) S.stakeholders = account.stakeholders;
+  launchTool('postcall');
+}
+
+function startCallPrepForAccount() { quickPrepCall(S_accountId); }
+function startPostCallForAccount() { quickPostCall(S_accountId); }
+
+function loadCallPrep(accountId, callIndex) {
+  const account = getAccount(accountId);
+  const call = account?.calls?.[callIndex];
+  if(!call?.savedState) return;
+  Object.assign(S, call.savedState);
+  S_accountId = accountId;
+  launchTool('precall');
+  if(S.outputGenerated) {
+    setTimeout(() => {
+      renderOutputs({ podcastScript: S.podcastScript, stakeholderAnalysis: S.stakeholders, preCallBrief: S.brief, managerSummary: S.intakeData.managerSummary||'' });
+      showPrecallView('outputs');
+    }, 300);
+  }
+  toast(`✅ Loaded brief for ${account.name}`);
+}
+
+function saveCallToAccount(type, summary, extra = {}) {
+  if(!S_accountId) {
+    if(S.intakeData?.accountName) {
+      const accounts = getAccounts();
+      let account = accounts.find(a => a.name.toLowerCase() === S.intakeData.accountName.toLowerCase());
+      if(!account) {
+        account = { id:'acct_'+Date.now(), name:S.intakeData.accountName, type:'hospital', location:S.intakeData.hospital||'', createdAt:Date.now(), calls:[], stakeholders:[], nextStep:'' };
+      }
+      S_accountId = account.id;
+    } else return;
+  }
+  const account = getAccount(S_accountId) || { id: S_accountId, name:'', calls:[], stakeholders:[] };
+  if(S.stakeholders?.length) account.stakeholders = S.stakeholders;
+  if(extra.nextStep) account.nextStep = extra.nextStep;
+  const callEntry = {
+    type, date: Date.now(), summary,
+    nextStep: extra.nextStep || '',
+    hasBrief: type === 'prep' && S.outputGenerated,
+    savedState: type === 'prep' ? {
+      intakeData: S.intakeData, stakeholders: S.stakeholders,
+      brief: S.brief, podcastScript: S.podcastScript,
+      outputGenerated: S.outputGenerated, rpDrName: S.rpDrName,
+    } : null,
+  };
+  if(!account.calls) account.calls = [];
+  account.calls.push(callEntry);
+  upsertAccount(account);
+  toast(`✅ Saved to ${account.name}`);
+}
+
+// ══════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════
+function showView(id) {
+  document.querySelectorAll('.app > .view').forEach(v=>{ v.classList.remove('active'); v.style.display='none'; });
+  const v = document.getElementById(id);
+  if(v){ v.style.display='flex'; v.classList.add('active'); }
+  const isHome = id==='view-home';
+  document.getElementById('btn-home').style.display  = isHome?'none':'block';
+  document.getElementById('btn-clear').style.display = isHome?'none':'block';
+  document.getElementById('hdr-tool-label').style.display = isHome?'none':'flex';
+}
+
+function goHome() {
+  showView('view-home');
+  document.getElementById('hdr-tool-name') && (document.getElementById('hdr-tool-name').textContent = '');
+  S_accountId = null;
+  renderHome();
+}
+
+function launchTool(tool) {
+  const names = { precall:'Pre-Call Planner', postcall:'Post-Call Summary' };
+  const lbl = document.getElementById('hdr-tool-name');
+  if(lbl) lbl.textContent = names[tool]||tool;
+  showView('view-'+tool);
+  if(tool==='precall') initIntake();
+  if(tool==='postcall') initPostCall();
+}
+
+function showPrecallView(sub) {
+  const subs = ['intake','outputs','roleplay','debrief'];
+  subs.forEach(s=>{ const el=document.getElementById('pv-'+s); if(el){el.style.display='none';el.classList.remove('active');} });
+  const t = document.getElementById('pv-'+sub);
+  if(t){ t.style.display='flex'; t.classList.add('active'); }
+}
+
+// ══════════════════════════════════════════════
+// PASSWORD GATE
+// ══════════════════════════════════════════════
+function checkPassword() {
+  const inp = document.getElementById('password-input');
+  const val = inp ? inp.value.trim() : '';
+  if(!val) return;
+  const btn = document.querySelector('#modal-password .btn-teal');
+  if(btn) { btn.textContent = 'Connecting...'; btn.disabled = true; }
+  fetch(`${CONFIG.API_URL}/auth/login`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ password: val })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if(data.token) {
+      S.sessionToken = data.token;
+      sessionStorage.setItem('mdsc_token', data.token);
+      document.getElementById('modal-password').classList.remove('show');
+      const hasProfile = loadRepProfile();
+      if(!hasProfile) {
+        document.getElementById('modal-profile').classList.add('show');
+      } else {
+        warmUpMicrophone();
+        toast(`✅ Welcome back, ${S.rep.name}!`);
+      }
+    } else {
+      const err = document.getElementById('password-error');
+      if(err) err.style.display = 'block';
+      if(inp) { inp.value = ''; inp.focus(); }
+      if(btn) { btn.textContent = 'Enter →'; btn.disabled = false; }
+    }
+  })
+  .catch(() => {
+    const err2 = document.getElementById('password-error');
+    if(err2) { err2.textContent = 'Server waking up — please try again in 10 seconds'; err2.style.display='block'; }
+    if(btn) { btn.textContent = 'Enter →'; btn.disabled = false; }
+  });
+}
+
+// ══════════════════════════════════════════════
+// CLAUDE API
+// ══════════════════════════════════════════════
+async function claude(messages, system, maxTokens=1200, retries=2) {
+  const body = { model:'claude-sonnet-4-20250514', max_tokens:maxTokens, messages };
+  if(system) body.system = system;
+  try {
+    const resp = await fetch(`${CONFIG.API_URL}/proxy/claude`, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'x-session-token': S.sessionToken },
+      body: JSON.stringify(body)
+    });
+    if(resp.status === 401) {
+      const reauthed = await silentReauth();
+      if(reauthed && retries > 0) return claude(messages, system, maxTokens, retries - 1);
+      sessionStorage.removeItem('mdsc_token');
+      S.sessionToken = '';
+      showPasswordModal();
+      throw new Error('Session expired — please log in again');
+    }
+    const data = await resp.json();
+    if(data.error) throw new Error(data.error.message);
+    return data.content?.map(b=>b.text||'').join('')||'';
+  } catch(e) {
+    if(retries > 0 && e.message !== 'Session expired — please log in again') {
+      await new Promise(r => setTimeout(r, 2000));
+      return claude(messages, system, maxTokens, retries - 1);
+    }
+    throw e;
+  }
+}
+
+async function silentReauth() {
+  try {
+    const resp = await fetch(`${CONFIG.API_URL}/auth/login`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ password: CONFIG.PASSWORD })
+    });
+    const data = await resp.json();
+    if(data.token) {
+      S.sessionToken = data.token;
+      sessionStorage.setItem('mdsc_token', data.token);
+      return true;
+    }
+  } catch(e) {}
+  return false;
+}
+
+// ══════════════════════════════════════════════
+// TTS — routes through Railway proxy (fixes CORS/401)
+// ══════════════════════════════════════════════
+async function tts(text, voiceId) {
+  try {
+    const resp = await fetch(`${CONFIG.API_URL}/proxy/tts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-session-token': S.sessionToken,
+      },
+      body: JSON.stringify({ text, voiceId }),
+    });
+    if(!resp.ok) return null;
+    return await resp.arrayBuffer();
+  } catch(e) { return null; }
+}
+
+// ══════════════════════════════════════════════
+// VOICE SYSTEM
+// ══════════════════════════════════════════════
+let SR_instance = null;
+let SR_active = false;
+let SR_buffer = '';
+let SR_stopping = false;
+let SR_silenceTimer = null;
+let SR_currentTarget = null;
+let aiAudioCtx = null;
+let aiCurrentSource = null;
+
+function warmUpMicrophone() {
+  if(SR_instance) return;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR) {
+    setVoiceStatus('⚠️ Use Chrome for voice input');
+    setRpVoiceStatus('⚠️ Use Chrome for voice input');
+    return;
+  }
+  SR_instance = new SR();
+  SR_instance.continuous = false;
+  SR_instance.interimResults = true;
+  SR_instance.lang = 'en-US';
+
+  SR_instance.onresult = (e) => {
+    if(!SR_active) return;
+    let interim = '', final = '';
+    for(let i = e.resultIndex; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript;
+      if(e.results[i].isFinal) final += t;
+      else interim += t;
+    }
+    if(final) SR_buffer += (SR_buffer ? ' ' : '') + final.trim();
+    const display = (SR_buffer + (interim ? ' ' + interim : '')).trim();
+    const inp = getActiveInput();
+    if(inp) inp.value = display;
+    clearTimeout(SR_silenceTimer);
+    if(final) {
+      SR_silenceTimer = setTimeout(() => { if(SR_active) stopAndSend(); }, 3000);
+    }
+  };
+
+  SR_instance.onerror = (e) => {
+    if(e.error === 'not-allowed') { SR_stopping = true; setAllVoiceStatus('⚠️ Mic blocked — allow microphone access'); return; }
+    if(e.error === 'no-speech') { if(SR_active) restartSR(); return; }
+  };
+
+  SR_instance.onend = () => { if(SR_active && !SR_stopping) restartSR(); };
+}
+
+function getActiveInput() {
+  if(SR_currentTarget === 'roleplay') return document.getElementById('rp-input');
+  if(SR_currentTarget === 'postcall') return document.getElementById('postcall-input');
+  return document.getElementById('intake-input');
+}
+
+function restartSR() { try { SR_instance.start(); } catch(e) {} }
+
+function startListening(target) {
+  SR_currentTarget = target || 'intake';
+  if(!SR_instance) { warmUpMicrophone(); setTimeout(() => startListening(SR_currentTarget), 600); return; }
+  if(SR_active) { stopAndSend(); return; }
+  stopAiSpeaking(); stopRpSpeaking();
+  SR_active = true; SR_buffer = ''; SR_stopping = false;
+  clearTimeout(SR_silenceTimer);
+  const inp = getActiveInput(); if(inp) inp.value = '';
+  setAllMicState('listening', target);
+  setAllVoiceStatus('🎤 Listening — speak, then pause to send');
+  try { SR_instance.start(); } catch(e) {}
+}
+
+function stopAndSend() {
+  if(!SR_active) return;
+  SR_active = false;
+  clearTimeout(SR_silenceTimer);
+  try { SR_instance.stop(); } catch(e) {}
+  setTimeout(() => {
+    const inp = getActiveInput();
+    const text = inp ? inp.value.trim() : '';
+    setAllMicState('idle', SR_currentTarget);
+    if(text) {
+      setAllVoiceStatus('⏳ Sending...');
+      if(SR_currentTarget === 'roleplay') setTimeout(() => sendRpMsg(), 100);
+      else if(SR_currentTarget === 'postcall') setTimeout(() => sendPostCallMsg(), 100);
+      else setTimeout(() => sendIntakeMsg(), 100);
+    } else {
+      setAllVoiceStatus('Tap 🎤 to speak');
+    }
+  }, 300);
+}
+
+function setAllMicState(state, target) {
+  const btnIds = { intake:'mic-btn', roleplay:'rp-mic-btn', postcall:'pc-mic-btn' };
+  Object.values(btnIds).forEach(id => {
+    const btn = document.getElementById(id);
+    if(!btn) return;
+    btn.classList.remove('listening','processing');
+    btn.textContent = '🎤';
+  });
+  const targetBtn = document.getElementById(btnIds[target] || 'mic-btn');
+  if(!targetBtn) return;
+  if(state === 'listening') { targetBtn.classList.add('listening'); targetBtn.textContent = '🔴'; }
+  else if(state === 'processing') { targetBtn.classList.add('processing'); targetBtn.textContent = '⏳'; }
+}
+
+function setAllVoiceStatus(msg) {
+  ['voice-status','rp-voice-status','pc-voice-status'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.textContent = msg;
+  });
+}
+
+function setMicState(state) { setAllMicState(state, 'intake'); }
+function setVoiceStatus(msg) { const el=document.getElementById('voice-status'); if(el) el.textContent=msg; }
+function setRpMicState(state) { setAllMicState(state, 'roleplay'); }
+function setRpVoiceStatus(msg) { const el=document.getElementById('rp-voice-status'); if(el) el.textContent=msg; }
+function setPcMicState(state) { setAllMicState(state, 'postcall'); }
+function setPcVoiceStatus(msg) { const el=document.getElementById('pc-voice-status'); if(el) el.textContent=msg; }
+function startRpListening() { startListening('roleplay'); }
+function stopRpListening()  { stopAndSend(); }
+function startPcListening() { startListening('postcall'); }
+function stopPcListening()  { stopAndSend(); }
+function stopListening()    { stopAndSend(); }
+function restoreIntakeSRHandler() {}
+
+function stripMarkdown(text) {
+  return (text||'')
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/#{1,6}\s/g, '')
+    .replace(/`(.*?)`/g, '$1')
+    .replace(/^\s*[-•]\s/gm, '')
+    .replace(/STAGE_ASSESSMENT:.*$/gm, '')
+    .trim();
+}
+
+async function speakAiResponse(text) {
+  text = stripMarkdown(text);
+  if(!text || text.length < 3) return;
+  const speaking = document.getElementById('ai-speaking');
+  const micBtn = document.getElementById('mic-btn');
+  if(speaking) speaking.style.display='flex';
+  if(micBtn) micBtn.disabled = true;
+  setVoiceStatus('🔊 AI speaking...');
+  try {
+    const buf = await tts(text, S.keys.voice1);
+    if(buf) await playAiAudio(buf);
+    else await browserSpeak(text);
+  } catch(e) { await browserSpeak(text); }
+  if(speaking) speaking.style.display='none';
+  if(micBtn) micBtn.disabled = false;
+  setVoiceStatus('Tap 🎤 to speak');
+}
+
+async function speakClinicianResponse(text) {
+  text = stripMarkdown(text);
+  if(!text || text.length < 3) return;
+  const speakEl = document.getElementById('rp-ai-speaking');
+  const micBtn = document.getElementById('rp-mic-btn');
+  if(speakEl) speakEl.style.display='flex';
+  if(micBtn) micBtn.disabled = true;
+  setRpVoiceStatus('🔊 Dr. speaking...');
+  try {
+    const buf = await tts(text, S.keys.voice2);
+    if(buf) await playRpAudio(buf);
+    else await browserSpeakRp(text);
+  } catch(e) { await browserSpeakRp(text); }
+  if(speakEl) speakEl.style.display='none';
+  if(micBtn) micBtn.disabled = false;
+  setRpVoiceStatus('Tap 🎤 to speak as the rep');
+}
+
+async function playAiAudio(buf) {
+  if(!aiAudioCtx || aiAudioCtx.state==='closed') aiAudioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  if(aiAudioCtx.state === 'suspended') await aiAudioCtx.resume();
+  const decoded = await aiAudioCtx.decodeAudioData(buf.slice(0));
+  const src = aiAudioCtx.createBufferSource();
+  aiCurrentSource = src;
+  src.buffer = decoded; src.connect(aiAudioCtx.destination);
+  return new Promise(res => { src.onended = res; src.start(0); });
+}
+
+function stopAiSpeaking() {
+  try { if(aiCurrentSource){aiCurrentSource.stop();aiCurrentSource=null;} speechSynthesis.cancel(); } catch(e){}
+  const speaking = document.getElementById('ai-speaking');
+  if(speaking) speaking.style.display='none';
+  const micBtn = document.getElementById('mic-btn');
+  if(micBtn) micBtn.disabled=false;
+}
+
+let rpAudioCtx = null;
+let rpCurrentSource = null;
+
+async function playRpAudio(buf) {
+  if(!rpAudioCtx||rpAudioCtx.state==='closed') rpAudioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  if(rpAudioCtx.state==='suspended') await rpAudioCtx.resume();
+  const decoded = await rpAudioCtx.decodeAudioData(buf.slice(0));
+  const src = rpAudioCtx.createBufferSource();
+  rpCurrentSource = src;
+  src.buffer=decoded; src.connect(rpAudioCtx.destination);
+  return new Promise(res=>{src.onended=res;src.start(0);});
+}
+
+function stopRpSpeaking() {
+  try{if(rpCurrentSource){rpCurrentSource.stop();rpCurrentSource=null;}speechSynthesis.cancel();}catch(e){}
+  const el=document.getElementById('rp-ai-speaking');if(el)el.style.display='none';
+  const btn=document.getElementById('rp-mic-btn');if(btn)btn.disabled=false;
+}
+
+function browserSpeak(text) {
+  return new Promise(res=>{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=1.05;u.onend=res;u.onerror=res;speechSynthesis.speak(u);});
+}
+function browserSpeakRp(text) {
+  return new Promise(res=>{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=1.0;u.pitch=0.9;u.onend=res;u.onerror=res;speechSynthesis.speak(u);});
+}
+
+// ══════════════════════════════════════════════
+// TOOL 1 — INTAKE
+// ══════════════════════════════════════════════
+const INTAKE_SYSTEM = () => {
+  const accountKnown = S.intakeData?.accountName ? `\nIMPORTANT: You already know the rep is calling on ${S.intakeData.accountName}${S.intakeData.hospital ? ' (' + S.intakeData.hospital + ')' : ''}. Do NOT ask which account or hospital — skip straight to asking who specifically they are meeting with there (which physician, surgeon, or staff member).` : '';
+  return `You are an expert medical device sales coach conducting a pre-call planning session with a rep. Your job is to gather comprehensive account intelligence through natural conversation — not a form.
+${repContext()}${accountKnown}
+
+You will collect information across these phases in order:
+1. ACCOUNT BASICS — account name, hospital/practice, location, size, call objective
+2. STAKEHOLDERS — who they're meeting with, their titles/roles, how many stakeholders
+3. INFLUENCE & WINS — for each stakeholder: perceived persona (without using jargon — ask behavioral questions to figure it out), influence level, what a win looks like for them personally, whether they're likely a blocker or champion
+4. HISTORY & PRODUCTS — past interactions, current products/vendors, relationship quality
+5. OBJECTIONS — expected objections, past objections heard, competitive landscape
+6. CALL STRATEGY — what success looks like, ideal next step, anything unusual about this account
+
+IMPORTANT RULES:
+- Ask ONE question at a time. Never list multiple questions.
+- Be conversational and warm, not clinical.
+- When learning about stakeholders, use behavioral questions to determine persona type (Don't say "Are they a Skeptic?" — ask "How does this person typically respond to new ideas?" or "Does this person tend to ask a lot of questions before making decisions?")
+- Acknowledge what the rep says before asking the next question.
+- When you have enough info from all 6 phases (typically 15-25 exchanges), say exactly: DATA_READY on its own line, followed by a JSON object with this structure:
+DATA_READY
+{"accountName":"...","hospital":"...","objective":"...","product":"...","stakeholders":[{"name":"...","title":"...","persona":"skeptic|teacher|go-getter|guide|friend|climber","influence":1-10,"win":"...","role":"blocker|champion|neutral","keyIssue":"..."}],"history":"...","currentProducts":"...","objections":["..."],"callStrategy":"...","repName":"..."}
+
+- Keep going until you have meaningful data on at least 2 stakeholders and all 6 phases covered.
+- At the start of your response, on the FIRST LINE ONLY, write PHASE:N with no spaces (where N is 1-6). Example: PHASE:2. This must be the very first thing, before any other text.`;
+};
+
+async function initIntake() {
+  if(S.intakeMsgs.length > 0) return;
+  if(!S.sessionToken) {
+    let waited = 0;
+    while(!S.sessionToken && waited < 30) { await new Promise(r => setTimeout(r, 100)); waited++; }
+  }
+  if(!S.sessionToken) { addMsg('intake-msgs','ai','Please log in first.','🧠'); showPasswordModal(); return; }
+  const accountKnown = S.intakeData?.accountName;
+  const openingPrompt = accountKnown
+    ? `Start the pre-call planning session. You already know the rep is calling on ${accountKnown}. Greet them, confirm the account, and jump straight to asking who specifically they are meeting with there.`
+    : 'Start the pre-call planning session. Greet me and ask your first question.';
+  showThinking('intake-msgs');
+  try {
+    const opener = await claude([{role:'user', content: openingPrompt}], INTAKE_SYSTEM());
+    removeThinking('intake-msgs');
+    const {text, clean} = parseIntakeReply(opener);
+    addMsg('intake-msgs', 'ai', text, '🧠');
+    S.intakeMsgs.push({role:'assistant', content: clean});
+    speakAiResponse(text);
+  } catch(e) {
+    removeThinking('intake-msgs');
+    addMsg('intake-msgs','ai','Connection error — please try again.','🧠');
+  }
+}
+
+function parseIntakeReply(raw) {
+  let phase = null;
+  const phaseMatch = raw.match(/PHASE\s*:\s*(\d+)/i);
+  if(phaseMatch) phase = parseInt(phaseMatch[1]);
+  let cleaned = raw.replace(/PHASE\s*:\s*\d+\s*/gi, '').trim();
+  cleaned = cleaned.replace(/DATA_READY[\s\S]*$/, '').trim();
+  return {text: cleaned, phase, clean: cleaned};
+}
+
+async function sendIntakeMsg() {
+  const inp = document.getElementById('intake-input');
+  const text = inp.value.trim(); if(!text) return;
+  inp.value='';
+  setMicState('idle');
+  setVoiceStatus('⏳ AI thinking...');
+  addMsg('intake-msgs','self',text,'💼');
+  S.intakeMsgs.push({role:'user',content:text});
+  showThinking('intake-msgs');
+  try {
+    const reply = await claude(S.intakeMsgs, INTAKE_SYSTEM(), 1400);
+    removeThinking('intake-msgs');
+    if(reply.includes('DATA_READY')) {
+      const jsonMatch = reply.match(/DATA_READY\s*\n(\{[\s\S]*\})/);
+      if(jsonMatch) {
+        try { S.intakeData = JSON.parse(jsonMatch[1]); S.stakeholders = S.intakeData.stakeholders||[]; } catch(e){}
+      }
+      const {text:t} = parseIntakeReply(reply);
+      if(t) addMsg('intake-msgs','ai',t,'🧠');
+      S.intakeMsgs.push({role:'assistant',content:reply});
+      const doneMsg = "Great — I have everything I need. Hit Generate when you're ready to build your account brief and podcast.";
+      addMsg('intake-msgs','ai', doneMsg,'🧠');
+      document.getElementById('btn-generate').style.display='inline-flex';
+      updateProgress(6);
+      speakAiResponse(t || doneMsg);
+      saveSession();
+    } else {
+      const {text:t, phase:p, clean} = parseIntakeReply(reply);
+      addMsg('intake-msgs','ai',t,'🧠');
+      S.intakeMsgs.push({role:'assistant', content: clean});
+      if(p) updateProgress(p);
+      speakAiResponse(t);
+    }
+  } catch(e) {
+    removeThinking('intake-msgs');
+    setMicState('idle');
+    setVoiceStatus('Tap 🎤 to speak — auto-sends when you pause');
+    addMsg('intake-msgs','ai','Connection error — please try again.','🧠');
+  }
+}
+
+function handleIntakeEnter(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendIntakeMsg();} }
+
+function updateProgress(phase) {
+  const p = INTAKE_PHASES[Math.min(phase-1, INTAKE_PHASES.length-1)];
+  document.getElementById('ip-label').textContent = p.label;
+  document.getElementById('ip-fill').style.width = p.pct+'%';
+  document.getElementById('ip-pct').textContent = p.pct+'%';
+}
+
+// ══════════════════════════════════════════════
+// GENERATE OUTPUTS
+// ══════════════════════════════════════════════
+async function generateOutputs() {
+  showPrecallView('outputs');
+  document.getElementById('podcast-account-name').textContent = S.intakeData.accountName||'Account Brief';
+  const panel = document.getElementById('output-panel');
+  panel.innerHTML = `<div class="thinking"><span></span><span></span><span></span></div><p style="font-size:13px;color:var(--text3);margin-top:8px;">Building your account intelligence package...</p>`;
+  const context = JSON.stringify(S.intakeData);
+  try {
+    const raw = await claude([{role:'user', content:`Based on this account intelligence, generate a comprehensive output. Return ONLY valid JSON with no markdown.
+
+ACCOUNT DATA: ${context}
+
+Return this exact JSON structure:
+{
+  "podcastScript": [
+    {"host":1,"text":"Host 1 opening — introduce the account, set the scene. 2-3 sentences."},
+    {"host":2,"text":"Host 2 response — add context or ask a probing question about the account."}
+  ],
+  "stakeholderAnalysis": [
+    {"name":"...","persona":"...","influence":8,"role":"champion","keyIssue":"...","strategy":"How rep should approach this person specifically","win":"What a win looks like for them"}
+  ],
+  "preCallBrief": {
+    "objective":"One sentence call objective",
+    "credibilityBuilder":"Word-for-word script for stage 1 — show you know their world",
+    "reframe":"Word-for-word provocative reframe tied to their situation",
+    "rationalDrowning":"Data and evidence that makes the problem undeniable",
+    "emotionalImpact":"Patient outcome win, then physician status/reputation win, then financial win — all three layered",
+    "newWayForward":"Introduce the concept of a solution without naming the product",
+    "solution":"Introduce your product and connect every feature to the insight",
+    "expectedObjections":["objection 1 with suggested response","objection 2 with suggested response"]
+  },
+  "managerSummary":"3-4 sentence pre-call plan suitable for sharing with a manager"
+}
+
+The podcast should be a natural conversation between two hosts — Host 1 is strategic and analytical, Host 2 is tactical and rep-focused. Aim for 12-16 exchanges total.`
+    }], null, 3000);
+
+    const cleaned = raw.replace(/```json|```/g,'').trim();
+    let parsed;
+    try { parsed = JSON.parse(cleaned); } catch(e) {
+      panel.innerHTML = '<p style="color:var(--text2)">Error generating outputs. Please try again.</p>'; return;
+    }
+    S.podcastScript = parsed.podcastScript||[];
+    S.brief = parsed.preCallBrief||{};
+    S.outputGenerated = true;
+    saveSession();
+    const prepSummary = `Prep for ${S.intakeData.accountName||'account'} — ${(S.stakeholders||[]).map(s=>s.name).filter(Boolean).join(', ')||'stakeholders mapped'}. Objective: ${S.intakeData.objective||''}`;
+    saveCallToAccount('prep', prepSummary);
+    renderOutputs(parsed);
+    generatePodcastAudio(parsed.podcastScript||[]);
+  } catch(e) {
+    panel.innerHTML = `<p style="color:var(--text2)">Error: ${e.message}</p>`;
+  }
+}
+
+function renderOutputs(data) {
+  const panel = document.getElementById('output-panel');
+  const sks = (data.stakeholderAnalysis||[]).map(sk => `
+    <div class="sk-card">
+      <div class="sk-name">${esc(sk.name)}</div>
+      <div class="sk-role">${esc(sk.persona||'')} · Influence: ${sk.influence}/10</div>
+      <div class="influence-bar"><div class="influence-fill" style="width:${(sk.influence||5)*10}%;background:${sk.influence>=7?'var(--teal)':sk.influence>=4?'var(--gold)':'var(--coral)'}"></div></div>
+      <div class="sk-row"><span class="sk-label">Key Issue</span></div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px;">${esc(sk.keyIssue||'')}</div>
+      <div class="sk-row"><span class="sk-label">Their Win</span></div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:8px;">${esc(sk.win||'')}</div>
+      <div style="font-size:12px;color:var(--teal);font-style:italic;">${esc(sk.strategy||'')}</div>
+      <span class="sk-tag ${sk.role==='blocker'?'tag-blocker':sk.role==='champion'?'tag-champion':'tag-neutral'}">${sk.role||'neutral'}</span>
+    </div>`).join('');
+
+  const brief = data.preCallBrief||{};
+  const stages = [
+    {n:1,cls:'sp-1',title:'Credibility Builder',key:'credibilityBuilder'},
+    {n:2,cls:'sp-2',title:'The Reframe',key:'reframe'},
+    {n:3,cls:'sp-3',title:'Rational Drowning',key:'rationalDrowning'},
+    {n:4,cls:'sp-4',title:'Emotional Impact',key:'emotionalImpact'},
+    {n:5,cls:'sp-5',title:'New Way Forward',key:'newWayForward'},
+    {n:6,cls:'sp-6',title:'The Solution',key:'solution'},
+  ];
+  const objHtml = (brief.expectedObjections||[]).map(o=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--text2);margin-bottom:8px;line-height:1.6;">${esc(o)}</div>`).join('');
+
+  panel.innerHTML = `
+    <div class="op-title">${esc(S.intakeData.accountName||'Account')} <em>Brief</em></div>
+    <div class="op-sub">${esc(brief.objective||'')}</div>
+    <div class="info-box"><strong>Manager Summary:</strong> ${esc(data.managerSummary||'')}</div>
+
+    <div class="podcast-player" id="podcast-player">
+      <div class="pp-header">
+        <div class="pp-art">🎙️</div>
+        <div>
+          <div class="pp-title">${esc(S.intakeData.accountName||'Account')} Pre-Call Intelligence</div>
+          <div class="pp-sub">${(S.podcastScript||[]).length} segments · AI-generated account briefing</div>
+        </div>
+      </div>
+      <div class="pp-hosts">
+        <div class="pp-host"><div class="pp-host-dot" style="background:var(--teal)"></div>Host 1 — Strategic</div>
+        <div class="pp-host"><div class="pp-host-dot" style="background:var(--gold)"></div>Host 2 — Tactical</div>
+      </div>
+      <div id="pp-audio-status" style="font-size:12px;color:var(--text3);margin-bottom:12px;">🔄 Generating audio...</div>
+      <div class="pp-controls" id="pp-controls">
+        <button class="pp-play" id="pp-play-btn" onclick="togglePodcast()">▶</button>
+        <div class="pp-progress">
+          <div class="pp-bar-bg"><div class="pp-bar-fill" id="pp-bar"></div></div>
+          <div class="pp-times"><span id="pp-cur">0:00</span><span id="pp-dur">—</span></div>
+        </div>
+      </div>
+      <div class="pp-script" id="pp-script">
+        ${(S.podcastScript||[]).map((line,i)=>`
+          <div class="pp-script-line" id="ps-${i}">
+            <div class="pp-host-label" style="color:${line.host===1?'var(--teal)':'var(--gold)'}">${line.host===1?'HOST 1 — Strategic':'HOST 2 — Tactical'}</div>
+            <div>${esc(line.text)}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);margin-bottom:10px;">Stakeholder Map</div>
+    <div class="stakeholder-grid">${sks}</div>
+
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);margin:20px 0 10px;">6-Stage Challenger Brief</div>
+    ${stages.map(st=>`
+      <div class="op-section" id="ops-${st.key}">
+        <div class="op-section-hdr" onclick="toggleOpSection('${st.key}')">
+          <div class="op-section-num"><span class="stage-pill ${st.cls}" style="padding:3px 8px;font-size:11px;">${st.n}</span></div>
+          <div class="op-section-title">${st.title}</div>
+          <div class="op-section-chev">▼</div>
+        </div>
+        <div class="op-section-body">
+          <textarea id="brief-${st.key}" rows="4">${esc(brief[st.key]||'')}</textarea>
+        </div>
+      </div>`).join('')}
+
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);margin:20px 0 10px;">Expected Objections & Responses</div>
+    ${objHtml}
+
+    <div class="btn-row" style="margin-top:20px;">
+      <button class="btn btn-teal" onclick="initRolePlay()">Start Role-Play Practice →</button>
+      <button class="btn btn-ghost" onclick="downloadPlan()">⬇ Download Pre-Call Plan</button>
+    </div>`;
+
+  document.getElementById('ops-credibilityBuilder')?.classList.add('open');
+}
+
+function toggleOpSection(key) { document.getElementById('ops-'+key)?.classList.toggle('open'); }
+
+// ══════════════════════════════════════════════
+// PODCAST AUDIO
+// ══════════════════════════════════════════════
+async function generatePodcastAudio(script) {
+  S.podcastAudio = new Array(script.length).fill(null);
+  S.podcastAudioReady = 0;
+  const statusEl = document.getElementById('pp-audio-status');
+  const ctrlEl   = document.getElementById('pp-controls');
+
+  const generateSegment = async (i) => {
+    const voiceId = script[i].host===1 ? S.keys.voice1 : S.keys.voice2;
+    S.podcastAudio[i] = await tts(script[i].text, voiceId);
+    S.podcastAudioReady++;
+    if(statusEl) {
+      statusEl.textContent = S.podcastAudioReady >= script.length
+        ? '✅ Full audio ready'
+        : `🔄 Audio ${S.podcastAudioReady}/${script.length} ready...`;
+    }
+    if(S.podcastAudioReady === 1 && ctrlEl) ctrlEl.style.display='flex';
+  };
+
+  const firstBatch = Math.min(3, script.length);
+  await Promise.all(Array.from({length:firstBatch},(_,i)=>generateSegment(i)));
+  if(statusEl) statusEl.textContent = `✅ First ${firstBatch} segments ready — press play. Loading rest...`;
+  if(ctrlEl) ctrlEl.style.display='flex';
+  for(let i=firstBatch; i<script.length; i++) await generateSegment(i);
+}
+
+let podcastAudioCtx = null;
+let podcastCurrentSource = null;
+
+async function playPodcastSegment(buf) {
+  if(!podcastAudioCtx || podcastAudioCtx.state === 'closed') podcastAudioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  if(podcastAudioCtx.state === 'suspended') await podcastAudioCtx.resume();
+  const decoded = await podcastAudioCtx.decodeAudioData(buf.slice(0));
+  const src = podcastAudioCtx.createBufferSource();
+  podcastCurrentSource = src;
+  src.buffer = decoded; src.connect(podcastAudioCtx.destination);
+  return new Promise(res => { src.onended = res; src.start(0); });
+}
+
+function stopPodcast() {
+  try { if(podcastCurrentSource) { podcastCurrentSource.stop(); podcastCurrentSource = null; } } catch(e) {}
+}
+
+async function togglePodcast() {
+  if(S.podcastPlaying) {
+    S.podcastPlaying = false; stopPodcast();
+    document.getElementById('pp-play-btn').textContent = '▶'; return;
+  }
+  S.podcastPlaying = true;
+  document.getElementById('pp-play-btn').textContent = '⏸';
+  for(let i = S.podcastIdx; i < S.podcastScript.length; i++) {
+    if(!S.podcastPlaying) break;
+    S.podcastIdx = i;
+    document.querySelectorAll('.pp-script-line').forEach(l => l.classList.remove('active'));
+    const lineEl = document.getElementById('ps-' + i);
+    if(lineEl) { lineEl.classList.add('active'); lineEl.scrollIntoView({behavior:'smooth', block:'nearest'}); }
+    const barEl = document.getElementById('pp-bar');
+    if(barEl) barEl.style.width = (((i+1)/S.podcastScript.length)*100) + '%';
+    if(S.podcastAudio[i]) {
+      try { await playPodcastSegment(S.podcastAudio[i]); } catch(e) { if(!S.podcastPlaying) break; }
+    } else {
+      const statusEl = document.getElementById('pp-audio-status');
+      if(statusEl) statusEl.textContent = `⏳ Loading segment ${i+1}...`;
+      let waited = 0;
+      while(!S.podcastAudio[i] && waited < 100 && S.podcastPlaying) { await sleep(100); waited++; }
+      if(!S.podcastPlaying) break;
+      if(S.podcastAudio[i]) { try { await playPodcastSegment(S.podcastAudio[i]); } catch(e) {} }
+      else await browserTTS(S.podcastScript[i].text);
+      if(statusEl && S.podcastPlaying) statusEl.textContent = '🔊 Playing...';
+    }
+  }
+  if(S.podcastPlaying) {
+    S.podcastIdx = 0;
+    document.getElementById('pp-play-btn').textContent = '▶';
+    document.querySelectorAll('.pp-script-line').forEach(l => l.classList.remove('active'));
+    const statusEl = document.getElementById('pp-audio-status');
+    if(statusEl) statusEl.textContent = '✅ Done';
+  }
+  S.podcastPlaying = false;
+}
+
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function browserTTS(text) {
+  return new Promise(res=>{ const utt = new SpeechSynthesisUtterance(text); utt.onend=res; utt.onerror=res; speechSynthesis.speak(utt); });
+}
+
+// ══════════════════════════════════════════════
+// ROLE-PLAY
+// ══════════════════════════════════════════════
+function toggleStageViz() {
+  S.stageVizOn = !S.stageVizOn;
+  const knob = document.getElementById('stage-knob');
+  const toggle = document.getElementById('stage-toggle');
+  if(S.stageVizOn) { knob.style.left='18px'; knob.style.background='var(--teal)'; toggle.style.background='var(--teal-dim)'; }
+  else { knob.style.left='2px'; knob.style.background='var(--text3)'; toggle.style.background='var(--border)'; }
+}
+
+function toggleRpCoaching() {
+  S.rpCoachingOn = !S.rpCoachingOn;
+  document.getElementById('btn-coaching-rp').textContent = S.rpCoachingOn ? '💡 Coaching On' : '💡 Coaching Off';
+  document.querySelectorAll('.coaching-tip').forEach(t=>{ t.classList.toggle('on', S.rpCoachingOn && t.dataset.has==='true'); });
+}
+
+function buildRpSystem() {
+  const brief = S.brief;
+  const account = S.intakeData;
+  const primary = S.stakeholders[0]||{name:'the physician',persona:'skeptic',keyIssue:'',win:''};
+  const diffMap = { skeptic:'resistant and skeptical', teacher:'data-driven and debate-oriented', 'go-getter':'ambitious and forward-thinking', guide:'supportive but needs equipping', friend:'warm but non-committal', climber:'politically motivated and career-focused' };
+  return `You are roleplaying as ${primary.name||'Dr. Smith'}, ${primary.title||'a physician'} at ${account.hospital||'a hospital'}.
+${repContext()}
+
+YOUR PERSONA: ${primary.persona||'skeptic'} — ${diffMap[primary.persona]||'guarded and professional'}
+YOUR KEY ISSUE: ${primary.keyIssue||'not specified'}
+WHAT A WIN LOOKS LIKE FOR YOU: ${primary.win||'not specified'}
+CURRENT PRODUCTS YOU USE: ${account.currentProducts||'not specified'}
+
+THE REP'S BRIEF (you don't know they have this — react naturally):
+Credibility Builder: ${brief.credibilityBuilder||''}
+Reframe: ${brief.reframe||''}
+Rational Drowning: ${brief.rationalDrowning||''}
+Emotional Impact: ${brief.emotionalImpact||''}
+New Way Forward: ${brief.newWayForward||''}
+Solution: ${brief.solution||''}
+
+Expected objections: ${(account.objections||[]).join(', ')}
+
+BEHAVIOR:
+- You are a realistic, intelligent clinician. Not a pushover or a cartoon villain.
+- React positively when the rep demonstrates knowledge of your world (Credibility Builder).
+- React mildly defensively to the Reframe — it should sting a little.
+- Soften when confronted with compelling data (Rational Drowning).
+- Respond to Emotional Impact based on your persona — ${primary.persona==='climber'?'status and reputation resonate most':primary.persona==='skeptic'?'patient outcomes data resonates most':'patient outcomes resonate most'}.
+- Push back if the rep skips straight to product features without building insight first.
+- Keep responses 2-4 sentences.
+- Never break character.
+
+CHALLENGER STAGE TRACKING — After your clinician response write on a NEW LINE:
+STAGE_ASSESSMENT: {"currentStage":1-6,"stageName":"...","coaching":"one specific tip for what to do next"}
+Stage guide: 1=Credibility Builder, 2=Reframe, 3=Rational Drowning, 4=Emotional Impact, 5=New Way Forward, 6=Solution
+Advance the stage number when the rep successfully executes that stage.`;
+}
+
+async function initRolePlay() {
+  showPrecallView('roleplay');
+  const primary = S.stakeholders[0]||{};
+  const names = ['Sarah Chen','Michael Patel','James Williams','Priya Martinez','David Kim'];
+  S.rpDrName = primary.name || ('Dr. '+names[Math.floor(Math.random()*names.length)]);
+  S.rpStage = 1;
+  document.getElementById('rp-dr-name').textContent = S.rpDrName;
+  document.getElementById('rp-dr-sub').textContent = `${primary.title||'Physician'} · ${primary.persona||'Skeptic'} · ${S.intakeData.hospital||''}`;
+  S.rpMsgs=[];
+  document.getElementById('rp-msgs').innerHTML='';
+  updateRpStagePill(1);
+  showRpThinking();
+  try {
+    const reply = await claude([{role:'user',content:'The rep just walked in for a scheduled meeting. Open the call as the clinician naturally.'}], buildRpSystem(), 600);
+    removeRpThinking();
+    parseAndAddRpMsg(reply);
+  } catch(e) { removeRpThinking(); }
+}
+
+async function sendRpMsg() {
+  const inp = document.getElementById('rp-input');
+  const text = inp.value.trim(); if(!text) return;
+  inp.value='';
+  setRpMicState('idle');
+  addRpMsgBubble('rep', text, null);
+  S.rpMsgs.push({role:'rep',content:text});
+  showRpThinking();
+  try {
+    const apiMsgs = S.rpMsgs.map(m=>({
+      role: m.role==='rep'?'user':'assistant',
+      content: m.role==='clinician' ? m.content+(m.stageRaw?'\n'+m.stageRaw:'') : m.content
+    }));
+    const reply = await claude(apiMsgs, buildRpSystem(), 700);
+    removeRpThinking();
+    parseAndAddRpMsg(reply);
+  } catch(e) {
+    removeRpThinking();
+    setRpMicState('idle');
+    setRpVoiceStatus('Tap 🎤 to speak as the rep');
+  }
+}
+
+function parseAndAddRpMsg(raw) {
+  const stageMatch = raw.match(/\nSTAGE_ASSESSMENT:\s*(\{.*\})/);
+  let stageData = null;
+  if(stageMatch) { try { stageData = JSON.parse(stageMatch[1]); } catch(e){} }
+  const text = raw.replace(/\nSTAGE_ASSESSMENT:.*$/,'').trim();
+  const coaching = stageData?.coaching||'';
+  if(stageData?.currentStage) { S.rpStage=stageData.currentStage; updateRpStagePill(S.rpStage); }
+  addRpMsgBubble('clinician', text, coaching);
+  S.rpMsgs.push({role:'clinician',content:text,coaching,stageRaw:stageMatch?stageMatch[0]:''});
+  speakClinicianResponse(text);
+}
+
+function addRpMsgBubble(role, text, coaching) {
+  const c = document.getElementById('rp-msgs');
+  const isClin = role==='clinician';
+  const div = document.createElement('div');
+  div.className = 'msg-row'+(isClin?'':' self');
+  const hasCoach = coaching&&coaching.length>0;
+  div.innerHTML=`
+    <div class="msg-row-av ${isClin?'av-coral':'av-teal'}" style="background:${isClin?'var(--coral-dim)':'var(--teal-dim)'};border:1px solid ${isClin?'rgba(255,107,107,0.3)':'var(--teal-border)'};">${isClin?'👨‍⚕️':'💼'}</div>
+    <div class="msg-row-body">
+      <div class="msg-row-from">${isClin?S.rpDrName:'You (Rep)'}</div>
+      <div class="msg-bubble ${isClin?'ai':'self'}">${fmtMd(text)}</div>
+      ${isClin&&hasCoach?`<div class="coaching-tip ${S.rpCoachingOn?'on':''}" data-has="true" style="margin-top:5px;padding:7px 12px;border-radius:8px;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.2);font-size:12px;color:var(--gold);line-height:1.5;"><span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;opacity:0.7;display:block;margin-bottom:2px;">💡 Challenger Coaching</span>${esc(coaching)}</div>`:''}
+    </div>`;
+  c.appendChild(div);
+  c.scrollTop=c.scrollHeight;
+}
+
+function updateRpStagePill(n) {
+  const pill = document.getElementById('rp-stage-pill');
+  if(!pill) return;
+  if(!S.stageVizOn) { pill.style.display='none'; return; }
+  const st = STAGES[n-1];
+  if(!st) return;
+  pill.style.display='inline-flex';
+  pill.innerHTML=`<span class="stage-pill ${st.cls}">Stage ${st.num}: ${st.name}</span>`;
+}
+
+function handleRpEnter(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendRpMsg();}}
+
+function showRpThinking(){
+  const c=document.getElementById('rp-msgs');
+  const d=document.createElement('div');d.id='rpthink';d.className='msg-row';
+  d.innerHTML=`<div class="msg-row-av" style="background:var(--coral-dim);border:1px solid rgba(255,107,107,0.3);">👨‍⚕️</div><div class="msg-row-body"><div class="msg-bubble ai"><div class="thinking"><span></span><span></span><span></span></div></div></div>`;
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
+}
+function removeRpThinking(){document.getElementById('rpthink')?.remove();}
+
+// ══════════════════════════════════════════════
+// DEBRIEF
+// ══════════════════════════════════════════════
+async function showDebrief() {
+  showPrecallView('debrief');
+  const dc = document.getElementById('debrief-content');
+  if(!S.rpMsgs || S.rpMsgs.length < 2) {
+    dc.innerHTML='<p style="color:var(--text2);padding:20px;">Complete a role-play conversation first, then click End & Score.</p>'; return;
+  }
+  dc.innerHTML='<div class="thinking"><span></span><span></span><span></span></div><p style="font-size:13px;color:var(--text3);margin-top:12px;">Analyzing your Challenger execution...</p>';
+  const transcript = S.rpMsgs.map(m=>`${m.role==='rep'?'REP':'CLINICIAN'}: ${m.content}`).join('\n\n');
+  try {
+    const raw = await claude([{role:'user',content:`You are a Challenger sales coach. Score this medical device sales rep on the 6-stage Challenger framework. Return ONLY valid JSON, no markdown.
+
+JSON format:
+{"overall":75,"scores":{"credibility":80,"reframe":65,"rational":70,"emotional":60,"newway":75,"solution":80},"insightDeployment":"assessment","strengths":["strength 1","strength 2"],"improvements":["improvement 1","improvement 2"],"summary":"2-3 sentence coaching note","nextFocus":"single most important thing to practice next time"}
+
+ACCOUNT: ${S.intakeData.accountName||'Unknown'}
+PRIMARY STAKEHOLDER PERSONA: ${S.stakeholders[0]?.persona||'unknown'}
+TRANSCRIPT:
+${transcript}`}], null, 1500);
+
+    let p;
+    try { p = JSON.parse(raw.replace(/```json|```/g,'').trim()); } catch(e) { p = null; }
+    if(!p) { dc.innerHTML='<p style="color:var(--text2);padding:20px;">Could not parse scoring response. Try again.</p>'; return; }
+
+    dc.innerHTML=`
+      <div class="score-block" style="display:flex;gap:24px;align-items:center;">
+        <div><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:4px;">Overall</div><div class="big-score">${p.overall}</div><div style="font-size:11px;color:var(--text3)">/100</div></div>
+        <div style="flex:1;">
+          ${srow('① Credibility Builder',p.scores?.credibility)}
+          ${srow('② The Reframe',p.scores?.reframe)}
+          ${srow('③ Rational Drowning',p.scores?.rational)}
+          ${srow('④ Emotional Impact',p.scores?.emotional)}
+          ${srow('⑤ New Way Forward',p.scores?.newway)}
+          ${srow('⑥ The Solution',p.scores?.solution)}
+        </div>
+      </div>
+      <div class="info-box"><strong>Insight Deployment:</strong> ${esc(p.insightDeployment||'')}</div>
+      <div class="two-col">
+        <div class="score-block"><h3>✅ Strengths</h3>${(p.strengths||[]).map(s=>`<p style="font-size:13px;color:var(--text2);margin-bottom:6px;">• ${esc(s)}</p>`).join('')}</div>
+        <div class="score-block"><h3>🎯 Improvements</h3>${(p.improvements||[]).map(s=>`<p style="font-size:13px;color:var(--text2);margin-bottom:6px;">• ${esc(s)}</p>`).join('')}</div>
+      </div>
+      <div class="score-block"><h3>Coach's Note</h3><p style="font-size:14px;color:var(--text2);line-height:1.7;">${esc(p.summary||'')}</p><div style="margin-top:10px;padding:10px 14px;background:var(--teal-dim);border:1px solid var(--teal-border);border-radius:8px;font-size:13px;color:var(--teal);"><strong>Focus next time:</strong> ${esc(p.nextFocus||'')}</div></div>`;
+  } catch(e) {
+    dc.innerHTML=`<p style="color:var(--text2);padding:20px;">Error: ${e.message} — please try again.</p>`;
+  }
+}
+
+function srow(label,val){const v=val||0;return`<div class="srow"><div class="srow-lbl">${label}</div><div class="srow-bg"><div class="srow-fill" style="width:${v}%"></div></div><div class="srow-val">${v}</div></div>`;}
+
+// ══════════════════════════════════════════════
+// POST-CALL (Tool 3)
+// ══════════════════════════════════════════════
+function showPcView(sub) {
+  ['chat','outputs'].forEach(s => {
+    const el = document.getElementById('pcv-'+s);
+    if(el) { el.style.display='none'; el.classList.remove('active'); }
+  });
+  const t = document.getElementById('pcv-'+sub);
+  if(t) { t.style.display='flex'; t.classList.add('active'); }
+}
+
+const POSTCALL_SYSTEM = () => {
+  const hasPreCall = S.intakeData?.accountName || S.stakeholders?.length > 0;
+  const account    = S.intakeData?.accountName || '';
+  const hospital   = S.intakeData?.hospital || '';
+  const repName    = S.intakeData?.repName || '';
+  const objective  = S.intakeData?.objective || '';
+  const stakeholderContext = (S.stakeholders||[]).map(sk =>
+    `- ${sk.name} (${sk.title||''}): persona=${sk.persona}, win="${sk.win}", role=${sk.role}, keyIssue="${sk.keyIssue}"`
+  ).join('\n');
+  const primarySk = S.stakeholders?.[0] || {};
+  const rpSummary = S.rpMsgs?.length > 0
+    ? `ROLE-PLAY PRACTICE WAS COMPLETED:\n- Rep practiced calling on ${S.rpDrName||primarySk.name||'the clinician'}\n- ${S.rpMsgs.length} exchanges completed\n`
+    : '';
+
+  return `You are a warm, experienced medical device sales coach doing a post-call debrief. Your goal is to gather what happened on the REAL call and generate: (1) a personalized follow-up email to the clinician, (2) a manager summary email, and (3) a Salesforce activity log.
+${repContext()}
+
+${hasPreCall ? `YOU ALREADY KNOW THIS FROM PRE-CALL PLANNING — do NOT ask for this again:
+- Account: ${account} (${hospital})
+- Primary clinician: ${primarySk.name||''} (${primarySk.title||''})
+- Clinician persona: ${primarySk.persona||''}
+- What a win looks like for them: ${primarySk.win||''}
+- Call objective: ${objective}
+- Rep name: ${repName}
+${stakeholderContext ? `- Stakeholders:\n${stakeholderContext}` : ''}
+${rpSummary}
+ONLY ask about what actually happened on the real call.` : ''}
+
+Ask ONE question at a time. Be conversational. Jump straight to asking how the call went. Gather:
+${hasPreCall ? `- How the real call went overall
+- What resonated most with ${primarySk.name||'the clinician'}
+- How they responded (positive/neutral/negative)
+- Any objections or concerns raised
+- What was agreed as the next step and when
+- Anything that didn't land
+- Any personal/relationship notes worth capturing` : `- Who they met with and at what account
+- What resonated most during the call
+- How the clinician responded overall
+- Any objections or concerns raised
+- What was agreed as the next step
+- Anything that didn't land well
+- Any personal/relationship notes
+- The rep's name (for email sign-off)`}
+
+After 4-8 exchanges, output DATA_READY on its own line followed by JSON:
+{"accountName":"${account||'...'}","clinician":"${primarySk.name||'...'}","clinicianTitle":"${primarySk.title||'...'}","clinicianPersona":"${primarySk.persona||'unknown'}","clinicianWin":"${primarySk.win||'unknown'}","repName":"${repName||'...'}","whatResonated":"...","clinicianResponse":"positive/neutral/negative","objections":["..."],"nextStep":"...","nextStepDate":"...","whatDidntLand":"...","relationshipNotes":"...","opportunityStage":"...","additionalNotes":"..."}`;
+};
+
+async function initPostCall() {
+  if(S.postcallMsgs.length > 0) return;
+  if(!S.sessionToken) {
+    let waited = 0;
+    while(!S.sessionToken && waited < 30) { await new Promise(r => setTimeout(r, 100)); waited++; }
+  }
+  if(!S.sessionToken) { showPasswordModal(); return; }
+  showThinking('postcall-msgs');
+  const hasPreCall = S.intakeData?.accountName || S.stakeholders?.length > 0;
+  const primarySk = S.stakeholders?.[0] || {};
+  const account = S.intakeData?.accountName || '';
+  const openingPrompt = hasPreCall
+    ? `Start the post-call debrief. You already know the rep was calling on ${primarySk.name||'the clinician'} at ${account}. Greet them warmly, acknowledge the pre-call prep work, and ask how the real call went.`
+    : 'Start the post-call debrief. Greet me warmly and ask your first question about who I called on today.';
+  try {
+    const reply = await claude([{role:'user', content: openingPrompt}], POSTCALL_SYSTEM());
+    removeThinking('postcall-msgs');
+    addMsg('postcall-msgs','ai',reply,'📋');
+    S.postcallMsgs.push({role:'assistant', content: reply});
+    speakPcResponse(reply);
+  } catch(e) {
+    removeThinking('postcall-msgs');
+    addMsg('postcall-msgs','ai','Having trouble connecting — try again.','📋');
+  }
+}
+
+async function sendPostCallMsg() {
+  const inp = document.getElementById('postcall-input');
+  const text = inp.value.trim(); if(!text) return;
+  inp.value='';
+  setPcMicState('idle');
+  addMsg('postcall-msgs','self',text,'💼');
+  S.postcallMsgs.push({role:'user',content:text});
+  showThinking('postcall-msgs');
+  try {
+    const reply = await claude(S.postcallMsgs, POSTCALL_SYSTEM(), 1400);
+    removeThinking('postcall-msgs');
+    setPcVoiceStatus('Tap 🎤 to speak — auto-sends when you pause');
+    if(reply.includes('DATA_READY')) {
+      const jm = reply.match(/DATA_READY\s*\n(\{[\s\S]*?\})/);
+      if(jm) { try { S.postcallData = JSON.parse(jm[1]); } catch(e){} }
+      if(S.intakeData?.accountName) S.postcallData.accountName = S.intakeData.accountName;
+      if(S.stakeholders?.[0]?.name) S.postcallData.clinician = S.postcallData.clinician || S.stakeholders[0].name;
+      if(S.intakeData?.repName) S.postcallData.repName = S.postcallData.repName || S.intakeData.repName;
+      const txt = reply.replace(/DATA_READY[\s\S]*/,'').trim();
+      if(txt) { addMsg('postcall-msgs','ai',txt,'📋'); speakPcResponse(txt); }
+      S.postcallMsgs.push({role:'assistant',content:reply});
+      if(S_accountId || S.intakeData?.accountName) {
+        const pcSummary = `Post-call: ${S.postcallData.clinicianResponse||''} response from ${S.postcallData.clinician||'clinician'}. ${S.postcallData.whatResonated ? 'Resonated: ' + S.postcallData.whatResonated.substring(0,80) + '...' : ''}`;
+        saveCallToAccount('postcall', pcSummary, { nextStep: S.postcallData.nextStep });
+      }
+      const doneMsg = '✅ Got everything I need. Click Generate Emails & Summary to create your follow-up email, manager update, and Salesforce log.';
+      addMsg('postcall-msgs','ai', doneMsg,'📋');
+      document.getElementById('btn-gen-outputs').style.display='inline-flex';
+    } else {
+      addMsg('postcall-msgs','ai',reply,'📋');
+      S.postcallMsgs.push({role:'assistant',content:reply});
+      speakPcResponse(reply);
+    }
+  } catch(e) {
+    removeThinking('postcall-msgs');
+    setPcVoiceStatus('Tap 🎤 to speak — auto-sends when you pause');
+  }
+}
+
+let pcAudioCtx = null;
+let pcCurrentSource = null;
+
+async function speakPcResponse(text) {
+  text = stripMarkdown(text);
+  if(!text || text.length < 3) return;
+  try {
+    const buf = await tts(text, S.keys.voice1);
+    if(!buf) return;
+    if(!pcAudioCtx || pcAudioCtx.state === 'closed') pcAudioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    if(pcAudioCtx.state === 'suspended') await pcAudioCtx.resume();
+    const decoded = await pcAudioCtx.decodeAudioData(buf.slice(0));
+    const src = pcAudioCtx.createBufferSource();
+    pcCurrentSource = src;
+    src.buffer = decoded; src.connect(pcAudioCtx.destination);
+    src.start(0);
+  } catch(e) {}
+}
+
+function handlePostCallEnter(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendPostCallMsg();}}
+
+async function generatePostCallOutputs() {
+  showPcView('outputs');
+  document.getElementById('pc-outputs-body').innerHTML = '<div class="thinking"><span></span><span></span><span></span></div><p style="font-size:13px;color:var(--text3);margin-top:10px;">Generating your follow-up email, manager summary, and Salesforce log...</p>';
+  const d = S.postcallData;
+  const personaGuide = {
+    skeptic:'Data-focused. Reference specific evidence. Keep it substantive, no fluff.',
+    teacher:'Intellectually curious. Reference the insight or concept that resonated. Invite further discussion.',
+    'go-getter':'Action-oriented. Lead with what\'s next and the competitive advantage.',
+    guide:'Relationship-first. Acknowledge their support. Give them what they need to champion internally.',
+    friend:'Warm and personal. Reference something from the conversation. Keep it light.',
+    climber:'Status-conscious. Reference peer usage or institutional recognition opportunities.',
+  };
+  const personaTone = personaGuide[d.clinicianPersona] || 'Warm but professional. Get to the point.';
+  try {
+    const raw = await claude([{role:'user', content:`Generate three post-call outputs for a medical device sales rep. Return ONLY valid JSON with no markdown.
+
+CALL DATA:
+Account: ${d.accountName||''}
+Clinician: ${d.clinician||''}, ${d.clinicianTitle||''}
+Clinician Persona: ${d.clinicianPersona||'unknown'}
+What a win looks like for them: ${d.clinicianWin||''}
+What resonated: ${d.whatResonated||''}
+Clinician response: ${d.clinicianResponse||''}
+Objections raised: ${(d.objections||[]).join(', ')||'none'}
+Next step agreed: ${d.nextStep||''} ${d.nextStepDate?'by '+d.nextStepDate:''}
+What didn't land: ${d.whatDidntLand||'none'}
+Relationship notes: ${d.relationshipNotes||''}
+Rep name: ${d.repName||''}
+Opportunity stage: ${d.opportunityStage||''}
+
+PERSONA TONE GUIDE: ${personaTone}
+
+{
+  "clinicianEmail": {
+    "subject": "email subject line — specific, not generic",
+    "body": "Full follow-up email. 3-4 short paragraphs. Sign off as ${d.repName||'[Rep Name]'}. No bullet points — flowing prose."
+  },
+  "managerEmail": {
+    "subject": "manager email subject",
+    "body": "Internal manager email. Cover: account/clinician met, call quality, what worked, objections handled, next steps, opportunity stage. Sign off as ${d.repName||'[Rep Name]'}."
+  },
+  "salesforceLog": "Plain text Salesforce activity log. Include: Date, Account, Contact, Call Outcome, What Worked, Objections, Next Steps, Opportunity Stage, Notes."
+}`
+    }], null, 2000);
+
+    let parsed;
+    try { parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); } catch(e) { parsed = null; }
+    if(!parsed) { document.getElementById('pc-outputs-body').innerHTML = '<p style="color:var(--text2)">Error generating outputs — please try again.</p>'; return; }
+
+    document.getElementById('pc-outputs-body').innerHTML = `
+      <div class="email-card">
+        <div class="email-card-hdr">
+          <div style="font-size:20px;">✉️</div>
+          <div>
+            <div class="email-card-title">Follow-Up Email to ${esc(d.clinician||'Clinician')}</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px;">Subject: ${esc(parsed.clinicianEmail?.subject||'')}</div>
+          </div>
+          <button class="copy-btn" onclick="copyEmail('clinician-email-body', this)">📋 Copy</button>
+        </div>
+        <div class="email-body" id="clinician-email-body">${esc(parsed.clinicianEmail?.body||'')}</div>
+      </div>
+      <div class="email-card">
+        <div class="email-card-hdr">
+          <div style="font-size:20px;">👔</div>
+          <div>
+            <div class="email-card-title">Manager Summary Email</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px;">Subject: ${esc(parsed.managerEmail?.subject||'')}</div>
+          </div>
+          <button class="copy-btn" onclick="copyEmail('manager-email-body', this)">📋 Copy</button>
+        </div>
+        <div class="email-body" id="manager-email-body">${esc(parsed.managerEmail?.body||'')}</div>
+      </div>
+      <div class="email-card">
+        <div class="email-card-hdr">
+          <div style="font-size:20px;">☁️</div>
+          <div class="email-card-title">Salesforce Activity Log</div>
+          <button class="copy-btn" onclick="copyEmail('sf-log-body', this)">📋 Copy</button>
+        </div>
+        <div class="sf-block" id="sf-log-body">${esc(parsed.salesforceLog||'')}</div>
+      </div>`;
+  } catch(e) {
+    document.getElementById('pc-outputs-body').innerHTML = `<p style="color:var(--text2)">Error: ${e.message}</p>`;
+  }
+}
+
+function copyEmail(elementId, btn) {
+  const el = document.getElementById(elementId);
+  if(!el) return;
+  navigator.clipboard.writeText(el.textContent).then(() => {
+    btn.textContent = '✅ Copied'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ══════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════
+function addMsg(containerId, type, html, avatar) {
+  const c=document.getElementById(containerId);
+  const isAI=type==='ai';
+  const div=document.createElement('div');
+  div.className='msg-row'+(isAI?'':' self');
+  div.innerHTML=`
+    <div class="msg-row-av ${isAI?'av-teal':'av-blue'}" style="background:${isAI?'var(--teal-dim)':'var(--surface3)'};border:1px solid ${isAI?'var(--teal-border)':'var(--border2)'};">${avatar||'🧠'}</div>
+    <div class="msg-row-body">
+      <div class="msg-row-from">${isAI?'AI Coach':'You'}</div>
+      <div class="msg-bubble ${isAI?'ai':'self'}">${fmtMd(html)}</div>
+    </div>`;
+  c.appendChild(div); c.scrollTop=c.scrollHeight;
+}
+
+function showThinking(cid){
+  const c=document.getElementById(cid);
+  const d=document.createElement('div'); d.className='msg-row'; d.id=cid+'-think';
+  d.innerHTML=`<div class="msg-row-av av-teal" style="background:var(--teal-dim);border:1px solid var(--teal-border);">🧠</div><div class="msg-row-body"><div class="msg-bubble ai"><div class="thinking"><span></span><span></span><span></span></div></div></div>`;
+  c.appendChild(d); c.scrollTop=c.scrollHeight;
+}
+function removeThinking(cid){document.getElementById(cid+'-think')?.remove();}
+
+function downloadPlan() {
+  const brief=S.brief; const account=S.intakeData;
+  const txt=`PRE-CALL PLAN — ${account.accountName||'Account'}
+Generated: ${new Date().toLocaleDateString()}
+═══════════════════════════════════════
+
+CALL OBJECTIVE
+${brief.objective||''}
+
+STAKEHOLDERS
+${(S.stakeholders||[]).map(sk=>`• ${sk.name} (${sk.title||''}) — ${sk.persona} — ${sk.role}\n  Key Issue: ${sk.keyIssue}\n  Their Win: ${sk.win}`).join('\n\n')}
+
+6-STAGE CHALLENGER BRIEF
+────────────────────────
+1. CREDIBILITY BUILDER
+${document.getElementById('brief-credibilityBuilder')?.value||brief.credibilityBuilder||''}
+
+2. THE REFRAME
+${document.getElementById('brief-reframe')?.value||brief.reframe||''}
+
+3. RATIONAL DROWNING
+${document.getElementById('brief-rationalDrowning')?.value||brief.rationalDrowning||''}
+
+4. EMOTIONAL IMPACT
+${document.getElementById('brief-emotionalImpact')?.value||brief.emotionalImpact||''}
+
+5. NEW WAY FORWARD
+${document.getElementById('brief-newWayForward')?.value||brief.newWayForward||''}
+
+6. THE SOLUTION
+${document.getElementById('brief-solution')?.value||brief.solution||''}
+
+EXPECTED OBJECTIONS
+${(account.objections||[]).map((o,i)=>`${i+1}. ${o}`).join('\n')}
+═══════════════════════════════════════`;
+  const blob=new Blob([txt],{type:'text/plain'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=`pre-call-${(account.accountName||'plan').replace(/\s+/g,'-')}.txt`; a.click();
+  toast('✅ Pre-call plan downloaded');
+}
+
+async function generatePostCall() { launchTool('postcall'); }
+
+// ── REP PROFILE ───────────────────────────────
+function saveProfile() {
+  const name        = document.getElementById('profile-name').value.trim();
+  const company     = document.getElementById('profile-company').value.trim();
+  const products    = document.getElementById('profile-products').value.trim();
+  const specialties = document.getElementById('profile-specialties').value.trim();
+  const territory   = document.getElementById('profile-territory').value.trim();
+  const email       = document.getElementById('profile-email').value.trim();
+  const notify      = document.getElementById('profile-notify').checked;
+  if(!name || !products) { document.getElementById('profile-error').style.display = 'block'; return; }
+  S.rep = { name, company, products, specialties, territory, email, notify };
+  sessionStorage.setItem('mdsc_rep', JSON.stringify(S.rep));
+  if(email && S.sessionToken) {
+    fetch(`${CONFIG.API_URL}/rep/profile`, {
+      method:'POST', headers:{'Content-Type':'application/json','x-session-token':S.sessionToken},
+      body: JSON.stringify(S.rep)
+    }).catch(() => {});
+  }
+  document.getElementById('modal-profile').classList.remove('show');
+  updateRepUI();
+  renderHome();
+  toast(`✅ Welcome, ${name}! Let's start coaching.`);
+  warmUpMicrophone();
+}
+
+function loadRepProfile() {
+  try {
+    const raw = sessionStorage.getItem('mdsc_rep');
+    if(raw) { S.rep = JSON.parse(raw); updateRepUI(); return true; }
+  } catch(e) {}
+  return false;
+}
+
+function updateRepUI() {
+  const existing = document.getElementById('rep-name-pill');
+  if(existing) existing.remove();
+  if(S.rep?.name) {
+    const pill = document.createElement('div');
+    pill.id = 'rep-name-pill';
+    pill.style.cssText = 'font-size:11px;color:var(--text2);cursor:pointer;padding:4px 10px;border:1px solid var(--border);border-radius:20px;';
+    pill.textContent = '👤 ' + S.rep.name;
+    pill.onclick = () => showProfileModal();
+    document.querySelector('.hdr-right')?.prepend(pill);
+  }
+}
+
+function showProfileModal() {
+  if(S.rep?.name)        document.getElementById('profile-name').value = S.rep.name;
+  if(S.rep?.company)     document.getElementById('profile-company').value = S.rep.company;
+  if(S.rep?.products)    document.getElementById('profile-products').value = S.rep.products;
+  if(S.rep?.specialties) document.getElementById('profile-specialties').value = S.rep.specialties;
+  if(S.rep?.territory)   document.getElementById('profile-territory').value = S.rep.territory;
+  if(S.rep?.email)       document.getElementById('profile-email').value = S.rep.email;
+  if(S.rep?.notify)      document.getElementById('profile-notify').checked = S.rep.notify;
+  document.getElementById('modal-profile').classList.add('show');
+}
+
+function repContext() {
+  if(!S.rep?.name) return '';
+  return `
+REP PROFILE:
+- Name: ${S.rep.name}
+- Company: ${S.rep.company||'not specified'}
+- Products: ${S.rep.products||'not specified'}
+- Specialties: ${S.rep.specialties||'not specified'}
+- Territory: ${S.rep.territory||'not specified'}
+Always address the rep by name (${S.rep.name}) when appropriate. Tailor all coaching, role-play, and insights to their specific products and specialties.`;
+}
+
+function saveSession() {
+  try {
+    sessionStorage.setItem('mdsc_platform_state', JSON.stringify({
+      intakeMsgs: S.intakeMsgs, intakeData: S.intakeData,
+      stakeholders: S.stakeholders, brief: S.brief,
+      podcastScript: S.podcastScript, outputGenerated: S.outputGenerated,
+      rpDrName: S.rpDrName, postcallMsgs: S.postcallMsgs, postcallData: S.postcallData,
+    }));
+  } catch(e) {}
+}
+
+function restoreSession() {
+  try {
+    const raw = sessionStorage.getItem('mdsc_platform_state');
+    if(!raw) return false;
+    Object.assign(S, JSON.parse(raw));
+    return true;
+  } catch(e) { return false; }
+}
+
+function confirmClear() {
+  if(!confirm('Start a new session? This clears all current data.')) return;
+  S.intakeMsgs=[]; S.intakeData={}; S.stakeholders={}; S.brief={}; S.rpMsgs=[];
+  S.podcastScript=[]; S.podcastAudio=[]; S.podcastAudioReady=0;
+  S.outputGenerated=false; S.postcallMsgs=[]; S.postcallData={};
+  sessionStorage.removeItem('mdsc_platform_state');
+  goHome();
+}
+
+function toast(msg,duration=3500){
+  const t=document.createElement('div');
+  t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--teal-border);border-radius:var(--r);padding:10px 16px;font-size:13px;color:var(--text2);z-index:9999;display:flex;align-items:center;gap:10px;box-shadow:0 4px 24px rgba(0,0,0,0.5);animation:slideup 0.3s ease;';
+  t.innerHTML=`${msg}<button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;margin-left:4px;">×</button>`;
+  document.body.appendChild(t); setTimeout(()=>t.remove(),duration);
+}
+
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmtMd(s){return(s||'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');}
+
+// ── STARTUP ──────────────────────────────────────
+window.addEventListener('load',()=>{
+  const savedToken = sessionStorage.getItem('mdsc_token');
+  if(savedToken) {
+    fetch(`${CONFIG.API_URL}/auth/verify`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-session-token':savedToken}
+    })
+    .then(r => r.json())
+    .then(data => {
+      if(data.valid) {
+        S.sessionToken = savedToken;
+        document.getElementById('modal-password').classList.remove('show');
+        const hasProfile = loadRepProfile();
+        const restored = restoreSession();
+        renderHome();
+        if(!hasProfile) {
+          document.getElementById('modal-profile').classList.add('show');
+        } else {
+          warmUpMicrophone();
+          if(restored && S.outputGenerated) {
+            launchTool('precall');
+            setTimeout(() => {
+              renderOutputs({ podcastScript:S.podcastScript, stakeholderAnalysis:S.stakeholders, preCallBrief:S.brief, managerSummary:S.intakeData.managerSummary||'' });
+              showPrecallView('outputs');
+              toast('✅ Session restored — ' + (S.intakeData.accountName||'your account'));
+            }, 300);
+          } else if(restored && S.intakeMsgs.length > 0) {
+            launchTool('precall');
+            setTimeout(() => {
+              S.intakeMsgs.forEach(m => {
+                if(m.role === 'user') addMsg('intake-msgs','self',m.content,'💼');
+                else addMsg('intake-msgs','ai',m.content,'🧠');
+              });
+              if(S.intakeData?.accountName) document.getElementById('btn-generate').style.display='inline-flex';
+              toast('✅ Session restored — pick up where you left off');
+            }, 300);
+          }
+        }
+      } else {
+        sessionStorage.removeItem('mdsc_token');
+        S.sessionToken = '';
+        showPasswordModal();
+      }
+    })
+    .catch(() => {
+      sessionStorage.removeItem('mdsc_token');
+      S.sessionToken = '';
+      showPasswordModal();
+    });
+  } else {
+    showPasswordModal();
+  }
+});
+
+function showPasswordModal() {
+  document.getElementById('modal-password').classList.add('show');
+  setTimeout(() => document.getElementById('password-input')?.focus(), 200);
+}
+</script>
+</body>
+</html>
