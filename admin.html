@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conceromed — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c0f;
+    --surface: #111318;
+    --surface2: #1a1d24;
+    --border: rgba(255,255,255,0.08);
+    --teal: #00c9a7;
+    --teal-dim: rgba(0,201,167,0.08);
+    --teal-border: rgba(0,201,167,0.25);
+    --coral: #ff6b6b;
+    --coral-dim: rgba(255,107,107,0.1);
+    --gold: #f0a500;
+    --gold-dim: rgba(240,165,0,0.1);
+    --green: #4caf7d;
+    --green-dim: rgba(76,175,125,0.1);
+    --text: #e8eaf0;
+    --text2: #9199aa;
+    --text3: #555e6e;
+    --r: 8px;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* AUTH SCREEN */
+  #auth-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0,201,167,0.06) 0%, transparent 60%);
+  }
+  .auth-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+  }
+  .auth-logo {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 8px;
+  }
+  .auth-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .auth-sub {
+    font-size: 13px;
+    color: var(--text3);
+    margin-bottom: 28px;
+  }
+  .auth-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 14px;
+    padding: 12px 16px;
+    outline: none;
+    letter-spacing: 2px;
+    text-align: center;
+    margin-bottom: 12px;
+    transition: border-color 0.15s;
+  }
+  .auth-input:focus { border-color: var(--teal-border); }
+  .auth-error { color: var(--coral); font-size: 12px; margin-bottom: 10px; display: none; }
+
+  /* MAIN APP */
+  #app-screen { display: none; }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .hdr-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .hdr-wordmark {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--teal);
+  }
+  .hdr-badge {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background: rgba(255,107,107,0.1);
+    border: 1px solid rgba(255,107,107,0.3);
+    color: var(--coral);
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+  .hdr-right {
+    font-size: 12px;
+    color: var(--text3);
+    font-family: var(--mono);
+  }
+
+  .main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+
+  /* SECTIONS */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .section-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+  .section-body { padding: 20px; }
+
+  /* FORM */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  .form-field { display: flex; flex-direction: column; gap: 6px; }
+  .form-field.full { grid-column: 1 / -1; }
+  label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+  input[type="text"], input[type="email"], input[type="date"], select, textarea {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--teal-border); }
+  select option { background: var(--surface2); }
+  textarea { resize: vertical; min-height: 70px; }
+
+  /* TIER SELECT */
+  .tier-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .tier-opt {
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    border-radius: var(--r);
+    padding: 10px 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .tier-opt:hover { border-color: var(--teal-border); }
+  .tier-opt.selected { border-color: var(--teal); background: var(--teal-dim); }
+  .tier-opt input { display: none; }
+  .tier-name { font-size: 12px; font-weight: 700; color: var(--text); }
+  .tier-desc { font-size: 10px; color: var(--text3); margin-top: 2px; }
+  .tier-opt.selected .tier-name { color: var(--teal); }
+
+  /* EXPIRY DATE (shows for comp_custom only) */
+  #expiry-field { display: none; }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border-radius: var(--r);
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-teal { background: var(--teal); color: #000; }
+  .btn-teal:hover { background: #00e0bb; }
+  .btn-teal:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-coral { background: var(--coral-dim); color: var(--coral); border: 1px solid rgba(255,107,107,0.3); }
+  .btn-coral:hover { background: rgba(255,107,107,0.2); }
+  .btn-ghost { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--teal-border); color: var(--text); }
+  .btn-sm { padding: 6px 12px; font-size: 11px; }
+
+  /* RESULT TOAST */
+  #comp-result {
+    margin-top: 14px;
+    padding: 12px 16px;
+    border-radius: var(--r);
+    font-size: 13px;
+    display: none;
+  }
+  #comp-result.success { background: var(--green-dim); border: 1px solid rgba(76,175,125,0.3); color: var(--green); }
+  #comp-result.error { background: var(--coral-dim); border: 1px solid rgba(255,107,107,0.3); color: var(--coral); }
+
+  /* MEMBERS TABLE */
+  .members-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .members-search {
+    flex: 1;
+    max-width: 280px;
+  }
+  .members-search input {
+    padding: 7px 12px;
+    font-size: 13px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th {
+    text-align: left;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-family: var(--mono);
+  }
+  .badge-active { background: var(--green-dim); color: var(--green); border: 1px solid rgba(76,175,125,0.3); }
+  .badge-canceled { background: var(--coral-dim); color: var(--coral); border: 1px solid rgba(255,107,107,0.2); }
+  .badge-inactive { background: var(--surface2); color: var(--text3); border: 1px solid var(--border); }
+  .tier-tag {
+    font-size: 10px;
+    font-family: var(--mono);
+    color: var(--text3);
+  }
+  .email-cell { font-family: var(--mono); font-size: 12px; }
+  .note-cell { font-size: 11px; color: var(--text3); font-style: italic; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .expiry-cell { font-size: 11px; }
+  .expiry-soon { color: var(--gold); }
+  .no-members { text-align: center; padding: 40px; color: var(--text3); font-size: 13px; }
+
+  /* STATS ROW */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .stat-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
+  .stat-val { font-size: 26px; font-weight: 800; color: var(--text); font-family: var(--mono); }
+  .stat-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  /* REVOKE CONFIRM */
+  #revoke-confirm {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  #revoke-confirm.show { display: flex; }
+  .revoke-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    max-width: 360px;
+    text-align: center;
+  }
+  .revoke-box h3 { font-size: 16px; margin-bottom: 8px; }
+  .revoke-box p { font-size: 13px; color: var(--text2); margin-bottom: 20px; }
+  .revoke-actions { display: flex; gap: 10px; justify-content: center; }
+
+  @media (max-width: 640px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .tier-grid { grid-template-columns: repeat(2, 1fr); }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    header { padding: 0 16px; }
+    .main { padding: 20px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">Conceromed</div>
+    <div class="auth-title">Admin Portal</div>
+    <div class="auth-sub">Enter your admin secret to continue</div>
+    <div class="auth-error" id="auth-error">Invalid secret — try again</div>
+    <input type="password" class="auth-input" id="auth-input" placeholder="••••••••••••" autocomplete="off">
+    <button class="btn btn-teal" style="width:100%;justify-content:center;" onclick="doAuth()">Enter →</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app-screen">
+  <header>
+    <div class="hdr-left">
+      <div class="hdr-wordmark">Conceromed</div>
+      <div class="hdr-badge">Admin</div>
+    </div>
+    <div class="hdr-right" id="hdr-api">api.meddevicesalespro.com</div>
+  </header>
+
+  <div class="main">
+
+    <!-- STATS -->
+    <div class="stats-row" id="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Total Pro</div>
+        <div class="stat-val" id="stat-total">—</div>
+        <div class="stat-sub">active members</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Comped</div>
+        <div class="stat-val" id="stat-comped">—</div>
+        <div class="stat-sub">no card on file</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Paid</div>
+        <div class="stat-val" id="stat-paid">—</div>
+        <div class="stat-sub">via Stripe</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Expiring Soon</div>
+        <div class="stat-val" id="stat-expiring">—</div>
+        <div class="stat-sub">within 30 days</div>
+      </div>
+      <div class="stat-card" style="border-color:rgba(245,166,35,0.4);">
+        <div class="stat-label" style="color:#f5a623;">⏳ ProScan Pending</div>
+        <div class="stat-val" id="stat-proscan-pending" style="color:#f5a623;">—</div>
+        <div class="stat-sub">need invite sent</div>
+      </div>
+      <div class="stat-card" style="border-color:rgba(0,201,167,0.4);">
+        <div class="stat-label" style="color:#00c9a7;">✅ ProScan Done</div>
+        <div class="stat-val" id="stat-proscan-done" style="color:#00c9a7;">—</div>
+        <div class="stat-sub">uploaded & active</div>
+      </div>
+    </div>
+
+    <!-- GRANT ACCESS -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Grant Pro Access</div>
+      </div>
+      <div class="section-body">
+        <div class="form-grid">
+          <div class="form-field full">
+            <label>Email Address</label>
+            <input type="email" id="comp-email" placeholder="rep@company.com">
+          </div>
+        </div>
+
+        <label style="display:block;margin-bottom:10px;">Access Tier</label>
+        <div class="tier-grid" id="tier-grid">
+          <label class="tier-opt selected" onclick="selectTier('founding_10',this)">
+            <input type="radio" name="tier" value="founding_10" checked>
+            <div class="tier-name">Founding 10</div>
+            <div class="tier-desc">Pro forever · no expiry</div>
+          </label>
+          <label class="tier-opt" onclick="selectTier('founding_40',this)">
+            <input type="radio" name="tier" value="founding_40">
+            <div class="tier-name">Founding 40</div>
+            <div class="tier-desc">Pro · 12 months</div>
+          </label>
+          <label class="tier-opt" onclick="selectTier('comp_30',this)">
+            <input type="radio" name="tier" value="comp_30">
+            <div class="tier-name">Demo 30</div>
+            <div class="tier-desc">Pro · 30 days</div>
+          </label>
+          <label class="tier-opt" onclick="selectTier('comp_90',this)">
+            <input type="radio" name="tier" value="comp_90">
+            <div class="tier-name">Demo 90</div>
+            <div class="tier-desc">Pro · 90 days</div>
+          </label>
+          <label class="tier-opt" onclick="selectTier('comp_custom',this)">
+            <input type="radio" name="tier" value="comp_custom">
+            <div class="tier-name">Custom Date</div>
+            <div class="tier-desc">You pick the expiry</div>
+          </label>
+          <label class="tier-opt" onclick="selectTier('paid',this)">
+            <input type="radio" name="tier" value="paid">
+            <div class="tier-name">Full Paid</div>
+            <div class="tier-desc">Mark as paid · no expiry</div>
+          </label>
+        </div>
+
+        <div id="expiry-field" class="form-grid" style="margin-bottom:14px;">
+          <div class="form-field">
+            <label>Expiry Date</label>
+            <input type="date" id="comp-expiry">
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-field full">
+            <label>Note (optional)</label>
+            <input type="text" id="comp-note" placeholder="e.g. Medtronic DBS manager demo, referred by Sarah">
+          </div>
+        </div>
+
+        <button class="btn btn-teal" id="comp-btn" onclick="grantAccess()">
+          ✓ Grant Pro Access
+        </button>
+
+        <div id="comp-result"></div>
+      </div>
+    </div>
+
+    <!-- MEMBERS TABLE -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">All Members</div>
+        <div class="members-toolbar">
+          <div class="members-search">
+            <input type="text" id="member-search" placeholder="Search by email..." oninput="filterMembers()" style="padding:6px 12px;font-size:12px;">
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="loadMembers()">↺ Refresh</button>
+        </div>
+      </div>
+      <div id="members-container">
+        <div class="no-members">Loading members...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- REVOKE CONFIRM -->
+<div id="revoke-confirm">
+  <div class="revoke-box">
+    <h3>Revoke Access?</h3>
+    <p id="revoke-email-display">This will immediately remove Pro access for this user.</p>
+    <div class="revoke-actions">
+      <button class="btn btn-ghost" onclick="closeRevoke()">Cancel</button>
+      <button class="btn btn-coral" onclick="confirmRevoke()">Yes, Revoke</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_URL = 'https://meddevice-coach-api-production.up.railway.app';
+let ADMIN_SECRET = '';
+let selectedTier = 'founding_10';
+let revokeTarget = '';
+let allMembers = [];
+
+// ── AUTH ──────────────────────────────────────
+document.getElementById('auth-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doAuth();
+});
+
+async function doAuth() {
+  const secret = document.getElementById('auth-input').value.trim();
+  if (!secret) return;
+  // Test the secret against a real endpoint
+  try {
+    const resp = await fetch(`${API_URL}/admin/members`, {
+      headers: { 'x-admin-secret': secret }
+    });
+    if (resp.ok) {
+      ADMIN_SECRET = secret;
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('app-screen').style.display = 'block';
+      loadMembers();
+    } else {
+      const err = document.getElementById('auth-error');
+      err.style.display = 'block';
+      setTimeout(() => err.style.display = 'none', 3000);
+    }
+  } catch(e) {
+    const err = document.getElementById('auth-error');
+    err.textContent = 'Could not reach server';
+    err.style.display = 'block';
+  }
+}
+
+// ── TIER SELECT ────────────────────────────────
+function selectTier(tier, el) {
+  selectedTier = tier;
+  document.querySelectorAll('.tier-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('expiry-field').style.display = tier === 'comp_custom' ? 'grid' : 'none';
+}
+
+// ── GRANT ACCESS ──────────────────────────────
+async function grantAccess() {
+  const email = document.getElementById('comp-email').value.trim();
+  const note = document.getElementById('comp-note').value.trim();
+  const expiryDate = document.getElementById('comp-expiry').value;
+  const result = document.getElementById('comp-result');
+  const btn = document.getElementById('comp-btn');
+
+  if (!email) { showResult('error', '⚠️ Email is required'); return; }
+  if (selectedTier === 'comp_custom' && !expiryDate) { showResult('error', '⚠️ Please pick an expiry date'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Granting...';
+
+  try {
+    const resp = await fetch(`${API_URL}/admin/comp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
+      body: JSON.stringify({ email, tier: selectedTier, expiryDate, note })
+    });
+    const data = await resp.json();
+    if (data.success) {
+      const tierLabels = {
+        founding_10: 'Founding 10 (Pro forever)',
+        founding_40: 'Founding 40 (12 months)',
+        comp_30: 'Demo — 30 days',
+        comp_90: 'Demo — 90 days',
+        comp_custom: `Custom — expires ${expiryDate}`,
+        paid: 'Full Paid'
+      };
+      showResult('success', `✓ Pro access granted to ${email} — ${tierLabels[selectedTier]}`);
+      document.getElementById('comp-email').value = '';
+      document.getElementById('comp-note').value = '';
+      loadMembers();
+    } else {
+      showResult('error', '⚠️ ' + (data.error || 'Unknown error'));
+    }
+  } catch(e) {
+    showResult('error', '⚠️ Server error: ' + e.message);
+  }
+
+  btn.disabled = false;
+  btn.textContent = '✓ Grant Pro Access';
+}
+
+function showResult(type, msg) {
+  const el = document.getElementById('comp-result');
+  el.className = type;
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 5000);
+}
+
+// ── LOAD MEMBERS ──────────────────────────────
+async function loadMembers() {
+  try {
+    const resp = await fetch(`${API_URL}/admin/members`, {
+      headers: { 'x-admin-secret': ADMIN_SECRET }
+    });
+    const data = await resp.json();
+    allMembers = data.members || [];
+    renderMembers(allMembers);
+    updateStats(allMembers);
+  } catch(e) {
+    document.getElementById('members-container').innerHTML =
+      `<div class="no-members" style="color:var(--coral)">Failed to load members</div>`;
+  }
+}
+
+function filterMembers() {
+  const q = document.getElementById('member-search').value.toLowerCase();
+  renderMembers(allMembers.filter(m => m.email?.toLowerCase().includes(q) || m.tier?.includes(q) || (m.comp_note||'').toLowerCase().includes(q)));
+}
+
+function updateStats(members) {
+  const active = members.filter(m => m.subscription_status === 'active');
+  const comped = active.filter(m => !m.stripe_subscription_id);
+  const paid = active.filter(m => !!m.stripe_subscription_id);
+  const now = Date.now();
+  const soon = active.filter(m => {
+    if (!m.current_period_end) return false;
+    const diff = new Date(m.current_period_end) - now;
+    return diff > 0 && diff < 30*24*60*60*1000;
+  });
+  document.getElementById('stat-total').textContent = active.length;
+  document.getElementById('stat-comped').textContent = comped.length;
+  document.getElementById('stat-paid').textContent = paid.length;
+  document.getElementById('stat-expiring').textContent = soon.length;
+  document.getElementById('stat-proscan-pending').textContent = members.filter(m => !m.has_proscan).length;
+  document.getElementById('stat-proscan-done').textContent = members.filter(m => m.has_proscan).length;
+}
+
+function renderMembers(members) {
+  const container = document.getElementById('members-container');
+  if (!members.length) {
+    container.innerHTML = `<div class="no-members">No members yet — grant access above to get started.</div>`;
+    return;
+  }
+
+  const tierLabels = {
+    founding_10: '🎖️ founding_10',
+    founding_40: '⭐ founding_40',
+    comp_30: '🔬 demo_30',
+    comp_90: '🔬 demo_90',
+    comp_custom: '📅 custom',
+    paid: '💳 paid',
+    none: '— none',
+  };
+
+  const rows = members.map(m => {
+    const status = m.subscription_status || 'inactive';
+    const badgeCls = status === 'active' ? 'badge-active' : status === 'canceled' ? 'badge-canceled' : 'badge-inactive';
+    const expiry = m.current_period_end ? formatExpiry(m.current_period_end) : '<span style="color:var(--text3)">No expiry</span>';
+    const note = m.comp_note ? `<div class="note-cell" title="${m.comp_note}">${m.comp_note}</div>` : '';
+    const grantedAt = m.comp_granted_at ? `<div style="font-size:10px;color:var(--text3);margin-top:2px;">${fmtDate(m.comp_granted_at)}</div>` : '';
+    return `
+      <tr>
+        <td>
+          <div class="email-cell">${m.email}</div>
+          ${m.rep_name ? `<div style="font-size:11px;color:var(--text3);margin-top:2px;">👤 ${m.rep_name}</div>` : ''}
+          ${note}
+        </td>
+        <td>
+          ${m.has_proscan
+            ? `<span style="color:#00c9a7;font-weight:700;font-size:13px;">✅ Uploaded</span><div style="font-size:10px;color:var(--text3);margin-top:2px;">${fmtDate(m.proscan_uploaded_at)}</div>`
+            : `<span style="color:#f5a623;font-weight:700;font-size:13px;">⏳ Pending</span><div style="margin-top:4px;"><a href="mailto:${m.email}?subject=Your%20ProScan%20Invitation&body=Hi%2C%0A%0APlease%20find%20your%20ProScan%20invitation%20below." style="font-size:10px;color:var(--teal);text-decoration:underline;cursor:pointer;">📧 Send Invite</a></div>`
+          }
+        </td>
+        <td><span class="badge ${badgeCls}">${status}</span></td>
+        <td><span class="tier-tag">${tierLabels[m.tier] || m.tier || '—'}</span></td>
+        <td class="expiry-cell">${expiry}</td>
+        <td>${grantedAt}</td>
+        <td>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-ghost btn-sm" onclick="prefillComp('${m.email}')">Edit</button>
+            <button class="btn btn-coral btn-sm" onclick="openRevoke('${m.email}')">Revoke</button>
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
+
+  container.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Email / Name</th>
+          <th>ProScan</th>
+          <th>Status</th>
+          <th>Tier</th>
+          <th>Expiry</th>
+          <th>Granted</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function formatExpiry(iso) {
+  const d = new Date(iso);
+  const now = Date.now();
+  const diff = d - now;
+  const days = Math.ceil(diff / (24*60*60*1000));
+  const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  if (diff < 0) return `<span style="color:var(--coral)">${label} (expired)</span>`;
+  if (days <= 30) return `<span class="expiry-soon">⚠️ ${label} (${days}d)</span>`;
+  return label;
+}
+
+function fmtDate(iso) {
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function prefillComp(email) {
+  document.getElementById('comp-email').value = email;
+  document.getElementById('comp-email').focus();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── REVOKE ────────────────────────────────────
+function openRevoke(email) {
+  revokeTarget = email;
+  document.getElementById('revoke-email-display').textContent = `Remove Pro access for ${email}?`;
+  document.getElementById('revoke-confirm').classList.add('show');
+}
+
+function closeRevoke() {
+  revokeTarget = '';
+  document.getElementById('revoke-confirm').classList.remove('show');
+}
+
+async function confirmRevoke() {
+  if (!revokeTarget) return;
+  try {
+    const resp = await fetch(`${API_URL}/admin/revoke`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
+      body: JSON.stringify({ email: revokeTarget })
+    });
+    const data = await resp.json();
+    if (data.success) {
+      closeRevoke();
+      loadMembers();
+    }
+  } catch(e) { closeRevoke(); }
+}
+</script>
+</body>
+</html>
