@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conceromed — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c0f; --surface: #111318; --surface2: #1a1d24;
+    --border: rgba(255,255,255,0.08);
+    --teal: #00c9a7; --teal-dim: rgba(0,201,167,0.08); --teal-border: rgba(0,201,167,0.25);
+    --coral: #ff6b6b; --coral-dim: rgba(255,107,107,0.1);
+    --gold: #f0a500; --gold-dim: rgba(240,165,0,0.1);
+    --green: #4caf7d; --green-dim: rgba(76,175,125,0.1);
+    --purple: #9b59b6; --purple-dim: rgba(155,89,182,0.1);
+    --blue: #4a9eff; --blue-dim: rgba(74,158,255,0.1);
+    --text: #e8eaf0; --text2: #9199aa; --text3: #555e6e;
+    --r: 8px; --mono: 'IBM Plex Mono', monospace; --sans: 'DM Sans', sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* AUTH */
+  #auth-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: radial-gradient(ellipse at 50% 0%, rgba(0,201,167,0.06) 0%, transparent 60%); }
+  .auth-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px; width: 100%; max-width: 380px; text-align: center; }
+  .auth-logo { font-family: var(--mono); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--teal); margin-bottom: 8px; }
+  .auth-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .auth-sub { font-size: 13px; color: var(--text3); margin-bottom: 28px; }
+  .auth-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r); color: var(--text); font-family: var(--mono); font-size: 14px; padding: 12px 16px; outline: none; letter-spacing: 2px; text-align: center; margin-bottom: 12px; transition: border-color 0.15s; }
+  .auth-input:focus { border-color: var(--teal-border); }
+  .auth-error { color: var(--coral); font-size: 12px; margin-bottom: 10px; display: none; }
+
+  /* MAIN */
+  #app-screen { display: none; }
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+  .hdr-left { display: flex; align-items: center; gap: 12px; }
+  .hdr-wordmark { font-family: var(--mono); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--teal); }
+  .hdr-badge { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.3); color: var(--coral); padding: 2px 8px; border-radius: 20px; }
+  .hdr-right { font-size: 12px; color: var(--text3); font-family: var(--mono); }
+
+  /* TAB NAV */
+  .tab-nav { display: flex; gap: 4px; padding: 20px 24px 0; max-width: 1100px; margin: 0 auto; }
+  .tab-btn { padding: 8px 18px; border-radius: 8px 8px 0 0; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid transparent; border-bottom: none; background: var(--surface2); color: var(--text3); transition: all 0.15s; }
+  .tab-btn.active { background: var(--surface); color: var(--text); border-color: var(--border); }
+  .tab-btn:hover:not(.active) { color: var(--text2); }
+
+  .main { max-width: 1100px; margin: 0 auto; padding: 0 24px 40px; }
+  .tab-panel { display: none; padding-top: 20px; }
+  .tab-panel.active { display: block; }
+
+  /* SECTION */
+  .section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 20px; overflow: hidden; }
+  .section-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .section-title { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); }
+  .section-body { padding: 20px; }
+
+  /* FORM */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .form-field { display: flex; flex-direction: column; gap: 6px; }
+  .form-field.full { grid-column: 1 / -1; }
+  label { font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text3); }
+  input[type="text"], input[type="email"], input[type="date"], select, textarea { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r); color: var(--text); font-family: var(--sans); font-size: 14px; padding: 10px 14px; outline: none; transition: border-color 0.15s; width: 100%; }
+  input:focus, select:focus, textarea:focus { border-color: var(--teal-border); }
+  select option { background: var(--surface2); }
+  textarea { resize: vertical; min-height: 70px; }
+
+  /* TIER GRID */
+  .tier-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .tier-opt { background: var(--surface2); border: 2px solid var(--border); border-radius: var(--r); padding: 10px 12px; cursor: pointer; text-align: center; transition: all 0.15s; }
+  .tier-opt:hover { border-color: var(--teal-border); }
+  .tier-opt.selected { border-color: var(--teal); background: var(--teal-dim); }
+  .tier-opt input { display: none; }
+  .tier-name { font-size: 12px; font-weight: 700; color: var(--text); }
+  .tier-desc { font-size: 10px; color: var(--text3); margin-top: 2px; }
+  .tier-opt.selected .tier-name { color: var(--teal); }
+  #expiry-field { display: none; }
+
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; border-radius: var(--r); font-family: var(--sans); font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; white-space: nowrap; }
+  .btn-teal { background: var(--teal); color: #000; }
+  .btn-teal:hover { background: #00e0bb; }
+  .btn-teal:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-coral { background: var(--coral-dim); color: var(--coral); border: 1px solid rgba(255,107,107,0.3); }
+  .btn-coral:hover { background: rgba(255,107,107,0.2); }
+  .btn-ghost { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--teal-border); color: var(--text); }
+  .btn-gold { background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(240,165,0,0.3); }
+  .btn-gold:hover { background: rgba(240,165,0,0.2); }
+  .btn-blue { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(74,158,255,0.3); }
+  .btn-blue:hover { background: rgba(74,158,255,0.2); }
+  .btn-sm { padding: 6px 12px; font-size: 11px; }
+  .btn-xs { padding: 4px 8px; font-size: 10px; }
+
+  /* RESULT */
+  .result-box { margin-top: 14px; padding: 12px 16px; border-radius: var(--r); font-size: 13px; display: none; }
+  .result-box.success { background: var(--green-dim); border: 1px solid rgba(76,175,125,0.3); color: var(--green); }
+  .result-box.error { background: var(--coral-dim); border: 1px solid rgba(255,107,107,0.3); color: var(--coral); }
+  .result-box.info { background: var(--blue-dim); border: 1px solid rgba(74,158,255,0.3); color: var(--blue); }
+
+  /* STATS */
+  .stats-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 20px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .stat-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
+  .stat-val { font-size: 24px; font-weight: 800; color: var(--text); font-family: var(--mono); }
+  .stat-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+  /* TABLE */
+  .members-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .members-search { flex: 1; min-width: 180px; max-width: 260px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text3); padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  td { padding: 11px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .badge { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 20px; font-family: var(--mono); }
+  .badge-active { background: var(--green-dim); color: var(--green); border: 1px solid rgba(76,175,125,0.3); }
+  .badge-canceled { background: var(--coral-dim); color: var(--coral); border: 1px solid rgba(255,107,107,0.2); }
+  .badge-inactive { background: var(--surface2); color: var(--text3); border: 1px solid var(--border); }
+  .tier-tag { font-size: 10px; font-family: var(--mono); color: var(--text3); }
+  .email-cell { font-family: var(--mono); font-size: 12px; }
+  .no-members { text-align: center; padding: 40px; color: var(--text3); font-size: 13px; }
+
+  /* MODAL OVERLAY */
+  .modal-ov { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); align-items: center; justify-content: center; z-index: 200; padding: 20px; }
+  .modal-ov.show { display: flex; }
+  .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px 32px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+  .modal-box h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+  .modal-box .modal-sub { font-size: 13px; color: var(--text2); margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; flex-wrap: wrap; }
+
+  /* REP DETAIL PANEL */
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .detail-item { background: var(--surface2); border-radius: 8px; padding: 12px 14px; }
+  .detail-label { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text3); margin-bottom: 4px; }
+  .detail-val { font-size: 13px; color: var(--text); word-break: break-all; }
+  .detail-val.mono { font-family: var(--mono); font-size: 12px; }
+  .detail-item.full { grid-column: 1 / -1; }
+
+  /* WIPE CHECKBOXES */
+  .wipe-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+  .wipe-opt { display: flex; align-items: flex-start; gap: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; cursor: pointer; transition: border-color 0.15s; }
+  .wipe-opt:hover { border-color: var(--coral-dim); }
+  .wipe-opt input[type=checkbox] { width: 16px; height: 16px; margin-top: 1px; cursor: pointer; accent-color: var(--coral); flex-shrink: 0; }
+  .wipe-opt-label { font-size: 13px; font-weight: 600; color: var(--text); }
+  .wipe-opt-desc { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  @media (max-width: 768px) {
+    .form-grid, .detail-grid, .wipe-opts { grid-template-columns: 1fr; }
+    .tier-grid { grid-template-columns: repeat(2, 1fr); }
+    .stats-row { grid-template-columns: repeat(3, 1fr); }
+    header { padding: 0 16px; }
+    .main { padding: 0 16px 32px; }
+    .modal-box { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">Conceromed</div>
+    <div class="auth-title">Admin Portal</div>
+    <div class="auth-sub">Enter your admin secret to continue</div>
+    <div class="auth-error" id="auth-error">Invalid secret — try again</div>
+    <input type="password" class="auth-input" id="auth-input" placeholder="••••••••••••" autocomplete="off">
+    <button class="btn btn-teal" style="width:100%;justify-content:center;" onclick="doAuth()">Enter →</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app-screen">
+  <header>
+    <div class="hdr-left">
+      <div class="hdr-wordmark">Conceromed</div>
+      <div class="hdr-badge">Admin</div>
+    </div>
+    <div class="hdr-right">api.meddevicesalespro.com</div>
+  </header>
+
+  <!-- TABS -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('members')">👥 Members</button>
+    <button class="tab-btn" onclick="switchTab('grant')">✅ Grant Access</button>
+    <button class="tab-btn" onclick="switchTab('tools')">🛠️ Rep Tools</button>
+  </div>
+
+  <div class="main">
+
+    <!-- MEMBERS TAB -->
+    <div class="tab-panel active" id="tab-members">
+
+      <!-- STATS -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Total Active</div>
+          <div class="stat-val" id="stat-total">—</div>
+          <div class="stat-sub">pro members</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Comped</div>
+          <div class="stat-val" id="stat-comped">—</div>
+          <div class="stat-sub">no card</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Paid</div>
+          <div class="stat-val" id="stat-paid">—</div>
+          <div class="stat-sub">via Stripe</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Expiring</div>
+          <div class="stat-val" id="stat-expiring">—</div>
+          <div class="stat-sub">within 30 days</div>
+        </div>
+        <div class="stat-card" style="border-color:rgba(245,166,35,0.4);">
+          <div class="stat-label" style="color:#f5a623;">⏳ ProScan Pending</div>
+          <div class="stat-val" id="stat-proscan-pending" style="color:#f5a623;">—</div>
+          <div class="stat-sub">need invite</div>
+        </div>
+        <div class="stat-card" style="border-color:rgba(0,201,167,0.4);">
+          <div class="stat-label" style="color:#00c9a7;">✅ ProScan Done</div>
+          <div class="stat-val" id="stat-proscan-done" style="color:#00c9a7;">—</div>
+          <div class="stat-sub">uploaded</div>
+        </div>
+      </div>
+
+      <!-- MEMBERS TABLE -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">All Members</div>
+          <div class="members-toolbar">
+            <div class="members-search">
+              <input type="text" id="member-search" placeholder="Search by email..." oninput="filterMembers()" style="padding:6px 12px;font-size:12px;">
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="loadMembers()">↺ Refresh</button>
+            <span id="save-status" style="font-size:12px;color:var(--green);font-weight:600;"></span>
+          </div>
+        </div>
+        <div id="members-container">
+          <div class="no-members">Loading members...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRANT ACCESS TAB -->
+    <div class="tab-panel" id="tab-grant">
+      <div class="section">
+        <div class="section-header"><div class="section-title">Grant Pro Access</div></div>
+        <div class="section-body">
+          <div class="form-grid">
+            <div class="form-field full">
+              <label>Email Address</label>
+              <input type="email" id="comp-email" placeholder="rep@company.com">
+            </div>
+          </div>
+          <label style="display:block;margin-bottom:10px;">Access Tier</label>
+          <div class="tier-grid" id="tier-grid">
+            <label class="tier-opt selected" onclick="selectTier('founding_10',this)">
+              <input type="radio" name="tier" value="founding_10" checked>
+              <div class="tier-name">Founding 10</div>
+              <div class="tier-desc">Pro forever · no expiry</div>
+            </label>
+            <label class="tier-opt" onclick="selectTier('founding_40',this)">
+              <input type="radio" name="tier" value="founding_40">
+              <div class="tier-name">Founding 40</div>
+              <div class="tier-desc">Pro · 12 months</div>
+            </label>
+            <label class="tier-opt" onclick="selectTier('comp_30',this)">
+              <input type="radio" name="tier" value="comp_30">
+              <div class="tier-name">Demo 30</div>
+              <div class="tier-desc">Pro · 30 days</div>
+            </label>
+            <label class="tier-opt" onclick="selectTier('comp_90',this)">
+              <input type="radio" name="tier" value="comp_90">
+              <div class="tier-name">Demo 90</div>
+              <div class="tier-desc">Pro · 90 days</div>
+            </label>
+            <label class="tier-opt" onclick="selectTier('comp_custom',this)">
+              <input type="radio" name="tier" value="comp_custom">
+              <div class="tier-name">Custom Date</div>
+              <div class="tier-desc">You pick the expiry</div>
+            </label>
+            <label class="tier-opt" onclick="selectTier('paid',this)">
+              <input type="radio" name="tier" value="paid">
+              <div class="tier-name">Full Paid</div>
+              <div class="tier-desc">Mark as paid · no expiry</div>
+            </label>
+          </div>
+          <div id="expiry-field" class="form-grid" style="margin-bottom:14px;">
+            <div class="form-field">
+              <label>Expiry Date</label>
+              <input type="date" id="comp-expiry">
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-field full">
+              <label>Note (optional)</label>
+              <input type="text" id="comp-note" placeholder="e.g. Medtronic DBS manager demo">
+            </div>
+          </div>
+          <button class="btn btn-teal" id="comp-btn" onclick="grantAccess()">✓ Grant Pro Access</button>
+          <div class="result-box" id="comp-result"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REP TOOLS TAB -->
+    <div class="tab-panel" id="tab-tools">
+
+      <!-- LOOKUP -->
+      <div class="section">
+        <div class="section-header"><div class="section-title">Rep Lookup</div></div>
+        <div class="section-body">
+          <div style="display:flex;gap:10px;align-items:flex-end;">
+            <div class="form-field" style="flex:1;">
+              <label>Email Address</label>
+              <input type="email" id="tools-email" placeholder="rep@company.com" onkeydown="if(event.key==='Enter')lookupRep()">
+            </div>
+            <button class="btn btn-teal" onclick="lookupRep()">🔍 Look Up</button>
+          </div>
+          <div id="rep-detail-panel" style="margin-top:20px;display:none;"></div>
+        </div>
+      </div>
+
+      <!-- QUICK ACTIONS — shown after lookup -->
+      <div id="quick-actions" style="display:none;">
+
+        <!-- RESEND MAGIC LINK -->
+        <div class="section">
+          <div class="section-header"><div class="section-title">✉️ Resend Magic Link</div></div>
+          <div class="section-body">
+            <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">Send a fresh login link to <strong id="ml-email-display">—</strong>. Use this if they can't log in or their link expired.</p>
+            <button class="btn btn-blue" onclick="resendMagicLink()">Send Magic Link →</button>
+            <div class="result-box" id="ml-result"></div>
+          </div>
+        </div>
+
+        <!-- EDIT PROFILE -->
+        <div class="section">
+          <div class="section-header"><div class="section-title">📝 Edit Profile Fields</div></div>
+          <div class="section-body">
+            <div class="form-grid">
+              <div class="form-field full"><label>Name</label><input type="text" id="edit-name" placeholder="Full name"></div>
+              <div class="form-field"><label>Company</label><input type="text" id="edit-company" placeholder="Company name"></div>
+              <div class="form-field"><label>Products</label><input type="text" id="edit-products" placeholder="Comma-separated products"></div>
+              <div class="form-field"><label>Specialties</label><input type="text" id="edit-specialties" placeholder="e.g. Neurology, Oncology"></div>
+              <div class="form-field"><label>Territory</label><input type="text" id="edit-territory" placeholder="e.g. Southeast US"></div>
+            </div>
+            <button class="btn btn-teal" onclick="saveProfileEdits()">💾 Save Profile Changes</button>
+            <div class="result-box" id="edit-result"></div>
+          </div>
+        </div>
+
+        <!-- CHANGE TIER + EXTEND EXPIRY -->
+        <div class="section">
+          <div class="section-header"><div class="section-title">🔄 Access Control</div></div>
+          <div class="section-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Change Tier</label>
+                <select id="change-tier-select">
+                  <option value="founding_10">Founding 10 — forever</option>
+                  <option value="founding_40">Founding 40 — 12 months</option>
+                  <option value="comp_30">Demo 30 — 30 days</option>
+                  <option value="comp_90">Demo 90 — 90 days</option>
+                  <option value="comp_custom">Custom</option>
+                  <option value="paid">Full Paid</option>
+                  <option value="none">None (revoke)</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label>Extend Expiry (optional)</label>
+                <input type="date" id="extend-expiry-date" placeholder="Leave blank for no expiry">
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="btn btn-gold" onclick="changeTier()">🔄 Change Tier</button>
+              <button class="btn btn-ghost" onclick="extendExpiry()">⏰ Update Expiry Only</button>
+            </div>
+            <div class="result-box" id="tier-result"></div>
+          </div>
+        </div>
+
+        <!-- PROSCAN MANAGEMENT -->
+        <div class="section">
+          <div class="section-header"><div class="section-title">🧬 ProScan Management</div></div>
+          <div class="section-body">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+              <button class="btn btn-ghost" onclick="markProScanFromTools()">📬 Mark Invite Sent</button>
+              <button class="btn btn-coral" onclick="clearProScanFromTools()">🧹 Clear ProScan Data</button>
+            </div>
+            <p style="font-size:12px;color:var(--text3);">Clearing ProScan removes the assessment data and uploaded_at timestamp. The rep will need to re-upload. Billing and profile data are not affected.</p>
+            <div class="result-box" id="proscan-result"></div>
+          </div>
+        </div>
+
+        <!-- WIPE DATA -->
+        <div class="section" style="border-color:rgba(255,107,107,0.2);">
+          <div class="section-header" style="border-color:rgba(255,107,107,0.1);">
+            <div class="section-title" style="color:var(--coral);">⚠️ Wipe Rep Data</div>
+          </div>
+          <div class="section-body">
+            <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">Select what to clear. Billing status and tier are never wiped here — use Access Control above to change those.</p>
+            <div class="wipe-opts">
+              <label class="wipe-opt">
+                <input type="checkbox" id="wipe-profile">
+                <div><div class="wipe-opt-label">Profile Fields</div><div class="wipe-opt-desc">Name, company, products, specialties, territory</div></div>
+              </label>
+              <label class="wipe-opt">
+                <input type="checkbox" id="wipe-proscan">
+                <div><div class="wipe-opt-label">ProScan Data</div><div class="wipe-opt-desc">Assessment JSON + uploaded timestamp</div></div>
+              </label>
+              <label class="wipe-opt">
+                <input type="checkbox" id="wipe-accounts">
+                <div><div class="wipe-opt-label">Accounts</div><div class="wipe-opt-desc">All account records + call history</div></div>
+              </label>
+              <label class="wipe-opt">
+                <input type="checkbox" id="wipe-goals">
+                <div><div class="wipe-opt-label">Goals</div><div class="wipe-opt-desc">All quarterly goal data</div></div>
+              </label>
+            </div>
+            <button class="btn btn-coral" onclick="openWipeConfirm()">🗑️ Wipe Selected Data</button>
+            <div class="result-box" id="wipe-result"></div>
+          </div>
+        </div>
+
+      </div><!-- /quick-actions -->
+    </div><!-- /tab-tools -->
+
+  </div>
+</div>
+
+<!-- REVOKE CONFIRM MODAL -->
+<div class="modal-ov" id="modal-revoke">
+  <div class="modal-box" style="max-width:360px;text-align:center;">
+    <h3>Revoke Access?</h3>
+    <p class="modal-sub" id="revoke-email-display">This will immediately remove Pro access for this user.</p>
+    <div class="modal-actions" style="justify-content:center;">
+      <button class="btn btn-ghost" onclick="closeRevoke()">Cancel</button>
+      <button class="btn btn-coral" onclick="confirmRevoke()">Yes, Revoke</button>
+    </div>
+  </div>
+</div>
+
+<!-- WIPE CONFIRM MODAL -->
+<div class="modal-ov" id="modal-wipe">
+  <div class="modal-box" style="max-width:400px;text-align:center;">
+    <h3 style="color:var(--coral);">⚠️ Confirm Data Wipe</h3>
+    <p class="modal-sub" id="wipe-confirm-msg">This action cannot be undone.</p>
+    <div class="modal-actions" style="justify-content:center;">
+      <button class="btn btn-ghost" onclick="closeWipeConfirm()">Cancel</button>
+      <button class="btn btn-coral" onclick="confirmWipe()">Yes, Wipe It</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_URL = 'https://meddevice-coach-api-production.up.railway.app';
+let ADMIN_SECRET = '';
+let selectedTier = 'founding_10';
+let revokeTarget = '';
+let allMembers = [];
+let currentToolsEmail = '';
+
+// ── AUTH ──────────────────────────────────────
+document.getElementById('auth-input').addEventListener('keydown', e => { if (e.key === 'Enter') doAuth(); });
+
+async function doAuth() {
+  const secret = document.getElementById('auth-input').value.trim();
+  if (!secret) return;
+  try {
+    const resp = await fetch(`${API_URL}/admin/members`, { headers: { 'x-admin-secret': secret } });
+    if (resp.ok) {
+      ADMIN_SECRET = secret;
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('app-screen').style.display = 'block';
+      loadMembers();
+    } else {
+      const err = document.getElementById('auth-error');
+      err.style.display = 'block';
+      setTimeout(() => err.style.display = 'none', 3000);
+    }
+  } catch(e) {
+    const err = document.getElementById('auth-error');
+    err.textContent = 'Could not reach server';
+    err.style.display = 'block';
+  }
+}
+
+// ── TABS ──────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  const tabs = ['members','grant','tools'];
+  document.querySelectorAll('.tab-btn')[tabs.indexOf(tab)].classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// ── TIER SELECT ────────────────────────────────
+function selectTier(tier, el) {
+  selectedTier = tier;
+  document.querySelectorAll('.tier-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('expiry-field').style.display = tier === 'comp_custom' ? 'grid' : 'none';
+}
+
+// ── GRANT ACCESS ──────────────────────────────
+async function grantAccess() {
+  const email = document.getElementById('comp-email').value.trim();
+  const note = document.getElementById('comp-note').value.trim();
+  const expiryDate = document.getElementById('comp-expiry').value;
+  const btn = document.getElementById('comp-btn');
+  if (!email) { showResult('comp-result','error','⚠️ Email is required'); return; }
+  if (selectedTier === 'comp_custom' && !expiryDate) { showResult('comp-result','error','⚠️ Please pick an expiry date'); return; }
+  btn.disabled = true; btn.textContent = 'Granting...';
+  try {
+    const resp = await fetch(`${API_URL}/admin/comp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
+      body: JSON.stringify({ email, tier: selectedTier, expiryDate, note })
+    });
+    const data = await resp.json();
+    if (data.success) {
+      const tierLabels = { founding_10:'Founding 10 (Pro forever)', founding_40:'Founding 40 (12 months)', comp_30:'Demo — 30 days', comp_90:'Demo — 90 days', comp_custom:'Custom expiry', paid:'Full Paid' };
+      showResult('comp-result','success',`✅ Access granted — ${email} — ${tierLabels[selectedTier]||selectedTier}`);
+      document.getElementById('comp-email').value = '';
+      document.getElementById('comp-note').value = '';
+      loadMembers();
+    } else {
+      showResult('comp-result','error','⚠️ ' + (data.error || 'Unknown error'));
+    }
+  } catch(e) {
+    showResult('comp-result','error','⚠️ Request failed: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = '✓ Grant Pro Access';
+  }
+}
+
+// ── LOAD MEMBERS ──────────────────────────────
+async function loadMembers() {
+  try {
+    const resp = await fetch(`${API_URL}/admin/members`, { headers: { 'x-admin-secret': ADMIN_SECRET } });
+    const data = await resp.json();
+    allMembers = data.members || [];
+    renderMembers(allMembers);
+    updateStats(allMembers);
+  } catch(e) {
+    document.getElementById('members-container').innerHTML = `<div class="no-members" style="color:var(--coral)">Failed to load members</div>`;
+  }
+}
+
+function filterMembers() {
+  const q = document.getElementById('member-search').value.toLowerCase();
+  renderMembers(allMembers.filter(m => m.email?.toLowerCase().includes(q) || m.tier?.includes(q) || (m.comp_note||'').toLowerCase().includes(q)));
+}
+
+function updateStats(members) {
+  const active = members.filter(m => m.subscription_status === 'active');
+  const comped = active.filter(m => !m.stripe_subscription_id);
+  const paid = active.filter(m => !!m.stripe_subscription_id);
+  const now = Date.now();
+  const soon = active.filter(m => {
+    if (['founding_10','founding_40'].includes(m.tier)) return false;
+    if (!m.current_period_end) return false;
+    const diff = new Date(m.current_period_end) - now;
+    return diff > 0 && diff < 30*24*60*60*1000;
+  });
+  document.getElementById('stat-total').textContent = active.length;
+  document.getElementById('stat-comped').textContent = comped.length;
+  document.getElementById('stat-paid').textContent = paid.length;
+  document.getElementById('stat-expiring').textContent = soon.length;
+  document.getElementById('stat-proscan-pending').textContent = members.filter(m => !m.has_proscan).length;
+  document.getElementById('stat-proscan-done').textContent = members.filter(m => m.has_proscan).length;
+}
+
+function renderMembers(members) {
+  const container = document.getElementById('members-container');
+  if (!members.length) { container.innerHTML = `<div class="no-members">No members yet.</div>`; return; }
+  const tierLabels = { founding_10:'🎖️ founding_10', founding_40:'⭐ founding_40', comp_30:'🔬 demo_30', comp_90:'🔬 demo_90', comp_custom:'📅 custom', paid:'💳 paid', none:'— none' };
+  const rows = members.map(m => {
+    const status = m.subscription_status || 'inactive';
+    const badgeCls = status === 'active' ? 'badge-active' : status === 'canceled' ? 'badge-canceled' : 'badge-inactive';
+    const noExpiryTiers = ['founding_10','founding_40'];
+    const expiry = noExpiryTiers.includes(m.tier)
+      ? '<span style="color:var(--teal);font-weight:600;">🎖️ Forever</span>'
+      : m.current_period_end ? formatExpiry(m.current_period_end) : '<span style="color:var(--text3)">No expiry</span>';
+    const grantedAt = m.comp_granted_at ? `<div style="font-size:10px;color:var(--text3);">${fmtDate(m.comp_granted_at)}</div>` : '';
+    const note = m.comp_note ? `<div style="font-size:11px;color:var(--text3);font-style:italic;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${m.comp_note}">${m.comp_note}</div>` : '';
+    const proscanCell = m.has_proscan
+      ? `<span style="color:#00c9a7;font-weight:700;font-size:13px;">✅ Uploaded</span><div style="font-size:10px;color:var(--text3);margin-top:2px;">${fmtDate(m.proscan_uploaded_at)}</div>`
+      : m.proscan_invited_at
+        ? `<span style="color:#f5a623;font-weight:700;font-size:13px;">⏳ Pending</span><div style="font-size:10px;color:var(--text3);margin-top:2px;">Sent ${fmtDate(m.proscan_invited_at)}</div><div style="margin-top:4px;"><label style="font-size:11px;color:var(--text3);cursor:pointer;display:flex;align-items:center;gap:5px;"><input type="checkbox" checked onchange="markProScanInvite('${m.email}', this.checked)" style="cursor:pointer;"> Invite sent</label></div>`
+        : `<span style="color:#f5a623;font-weight:700;font-size:13px;">⏳ Pending</span><div style="margin-top:6px;"><label style="font-size:12px;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:6px;"><input type="checkbox" onchange="markProScanInvite('${m.email}', this.checked)" style="cursor:pointer;width:15px;height:15px;"> Mark sent</label></div>`;
+    return `<tr>
+      <td><div class="email-cell">${m.email}</div>${m.rep_name?`<div style="font-size:11px;color:var(--text3);margin-top:2px;">👤 ${m.rep_name}</div>`:''}${note}</td>
+      <td>${proscanCell}</td>
+      <td><span class="badge ${badgeCls}">${status}</span></td>
+      <td><span class="tier-tag">${tierLabels[m.tier]||m.tier||'—'}</span></td>
+      <td>${expiry}${grantedAt}</td>
+      <td>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;">
+          <button class="btn btn-blue btn-xs" onclick="openToolsFor('${m.email}')">🛠️</button>
+          <button class="btn btn-ghost btn-xs" onclick="prefillComp('${m.email}')">Edit</button>
+          <button class="btn btn-coral btn-xs" onclick="openRevoke('${m.email}')">Revoke</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+  container.innerHTML = `<table><thead><tr><th>Email / Name</th><th>ProScan</th><th>Status</th><th>Tier</th><th>Expiry / Granted</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function formatExpiry(iso) {
+  const d = new Date(iso); const now = Date.now(); const diff = d - now; const days = Math.ceil(diff/(24*60*60*1000));
+  const label = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  if (diff < 0) return `<span style="color:var(--coral)">${label} (expired)</span>`;
+  if (days <= 30) return `<span style="color:var(--gold)">⚠️ ${label} (${days}d)</span>`;
+  return label;
+}
+
+function fmtDate(iso) { return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+
+function prefillComp(email) {
+  document.getElementById('comp-email').value = email;
+  switchTab('grant');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function openToolsFor(email) {
+  document.getElementById('tools-email').value = email;
+  switchTab('tools');
+  lookupRep();
+}
+
+// ── REVOKE ────────────────────────────────────
+function openRevoke(email) {
+  revokeTarget = email;
+  document.getElementById('revoke-email-display').textContent = `Remove Pro access for ${email}?`;
+  document.getElementById('modal-revoke').classList.add('show');
+}
+function closeRevoke() { revokeTarget = ''; document.getElementById('modal-revoke').classList.remove('show'); }
+
+async function confirmRevoke() {
+  if (!revokeTarget) return;
+  try {
+    const resp = await fetch(`${API_URL}/admin/revoke`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
+      body: JSON.stringify({ email: revokeTarget })
+    });
+    const data = await resp.json();
+    if (data.success) { closeRevoke(); loadMembers(); }
+  } catch(e) { closeRevoke(); }
+}
+
+// ── PROSCAN INVITE (members table) ────────────
+async function markProScanInvite(email, sent) {
+  try {
+    const resp = await fetch(`${API_URL}/admin/proscan-invite`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
+      body: JSON.stringify({ email, sent })
+    });
+    if (!resp.ok) { const err = await resp.text(); alert(`Save failed (${resp.status}): ${err}`); loadMembers(); return; }
+    const data = await resp.json();
+    if (data.success) {
+      const m = allMembers.find(x => x.email === email);
+      if (m) m.proscan_invited_at = sent ? new Date().toISOString() : null;
+      renderMembers(allMembers);
+      const statusEl = document.getElementById('save-status');
+      if (statusEl) { statusEl.textContent = '✅ Saved'; setTimeout(() => statusEl.textContent = '', 2000); }
+    } else { alert('Save failed: ' + (data.error||'unknown')); loadMembers(); }
+  } catch(e) { alert('Failed: ' + e.message); loadMembers(); }
+}
+
+// ── REP TOOLS ─────────────────────────────────
+async function lookupRep() {
+  const email = document.getElementById('tools-email').value.trim();
+  if (!email) return;
+  currentToolsEmail = email;
+  const panel = document.getElementById('rep-detail-panel');
+  panel.style.display = 'block';
+  panel.innerHTML = '<p style="color:var(--text3);font-size:13px;">Loading...</p>';
+  try {
+    const resp = await fetch(`${API_URL}/admin/rep-detail?email=${encodeURIComponent(email)}`, {
+      headers: { 'x-admin-secret': ADMIN_SECRET }
+    });
+    const data = await resp.json();
+    if (data.error) { panel.innerHTML = `<p style="color:var(--coral);font-size:13px;">Error: ${data.error}</p>`; return; }
+    const p = data.profile || {};
+    const b = data.billing || {};
+    panel.innerHTML = `
+      <div class="detail-grid">
+        <div class="detail-item"><div class="detail-label">Name</div><div class="detail-val">${p.name||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Company</div><div class="detail-val">${p.company||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Products</div><div class="detail-val">${p.products||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Territory</div><div class="detail-val">${p.territory||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Billing Status</div><div class="detail-val">${b.subscription_status||'none'}</div></div>
+        <div class="detail-item"><div class="detail-label">Tier</div><div class="detail-val">${b.tier||'none'}</div></div>
+        <div class="detail-item"><div class="detail-label">Accounts</div><div class="detail-val">${data.accountCount} saved${data.accounts?.length?': '+data.accounts.map(a=>a.name).join(', '):''}</div></div>
+        <div class="detail-item"><div class="detail-label">Goal Quarters</div><div class="detail-val">${data.goalCount}</div></div>
+        <div class="detail-item"><div class="detail-label">ProScan</div><div class="detail-val">${p.proscan_uploaded_at?'✅ Uploaded '+fmtDate(p.proscan_uploaded_at):p.proscan_invited_at?'⏳ Invited '+fmtDate(p.proscan_invited_at):'Not uploaded'}</div></div>
+        <div class="detail-item"><div class="detail-label">Last Updated</div><div class="detail-val">${p.updated_at?fmtDate(p.updated_at):'—'}</div></div>
+      </div>`;
+    // Pre-fill edit fields
+    document.getElementById('edit-name').value = p.name||'';
+    document.getElementById('edit-company').value = p.company||'';
+    document.getElementById('edit-products').value = p.products||'';
+    document.getElementById('edit-specialties').value = p.specialties||'';
+    document.getElementById('edit-territory').value = p.territory||'';
+    document.getElementById('ml-email-display').textContent = email;
+    const tierSel = document.getElementById('change-tier-select');
+    if (b.tier) tierSel.value = b.tier;
+    document.getElementById('quick-actions').style.display = 'block';
+  } catch(e) {
+    panel.innerHTML = `<p style="color:var(--coral);font-size:13px;">Failed to load: ${e.message}</p>`;
+  }
+}
+
+async function resendMagicLink() {
+  if (!currentToolsEmail) return;
+  try {
+    const resp = await fetch(`${API_URL}/admin/resend-magic-link`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
+      body: JSON.stringify({ email: currentToolsEmail })
+    });
+    const data = await resp.json();
+    if (data.success) showResult('ml-result','success',`✅ Magic link sent to ${currentToolsEmail}`);
+    else showResult('ml-result','error','⚠️ ' + (data.error||'Unknown error'));
+  } catch(e) { showResult('ml-result','error','⚠️ ' + e.message); }
+}
+
+async function saveProfileEdits() {
+  if (!currentToolsEmail) return;
+  const payload = {
+    email: currentToolsEmail,
+    name: document.getElementById('edit-name').value.trim(),
+    company: document.getElementById('edit-company').value.trim(),
+    products: document.getElementById('edit-products').value.trim(),
+    specialties: document.getElementById('edit-specialties').value.trim(),
+    territory: document.getElementById('edit-territory').value.trim(),
+  };
+  try {
+    const resp = await fetch(`${API_URL}/admin/edit-profile`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
+      body: JSON.stringify(payload)
+    });
+    const data = await resp.json();
+    if (data.success) { showResult('edit-result','success','✅ Profile updated'); lookupRep(); }
+    else showResult('edit-result','error','⚠️ ' + (data.error||'Unknown error'));
+  } catch(e) { showResult('edit-result','error','⚠️ ' + e.message); }
+}
+
+async function changeTier() {
+  if (!currentToolsEmail) return;
+  const tier = document.getElementById('change-tier-select').value;
+  try {
+    const resp = await fetch(`${API_URL}/admin/change-tier`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
+      body: JSON.stringify({ email: currentToolsEmail, tier })
+    });
+    const data = await resp.json();
+    if (data.success) { showResult('tier-result','success',`✅ Tier changed to ${tier}`); loadMembers(); lookupRep(); }
+    else showResult('tier-result','error','⚠️ ' + (data.error||'Unknown error'));
+  } catch(e) { showResult('tier-result','error','⚠️ ' + e.message); }
+}
+
+async function extendExpiry() {
+  if (!currentToolsEmail) return;
+  const expiry = document.getElementById('extend-expiry-date').value || null;
+  try {
+    const resp = await fetch(`${API_URL}/admin/extend-expiry`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
+      body: JSON.stringify({ email: currentToolsEmail, expiry })
+    });
+    const data = await resp.json();
+    if (data.success) { showResult('tier-result','success',`✅ Expiry updated to ${expiry||'no expiry'}`); loadMembers(); }
+    else showResult('tier-result','error','⚠️ ' + (data.error||'Unknown error'));
+  } catch(e) { showResult('tier-result','error','⚠️ ' + e.message); }
+}
+
+async function markProScanFromTools() {
+  if (!currentToolsEmail) return;
+  await markProScanInvite(currentToolsEmail, true);
+  showResult('proscan-result','success','✅ Marked as invite sent');
+  lookupRep();
+}
+
+async function clearProScanFromTools() {
+  if (!currentToolsEmail) return;
+  if (!confirm(`Clear ProScan data for ${currentToolsEmail}? They will need to re-upload.`)) return;
+  try {
+    const resp = await fetch(`${API_URL}/admin/wipe-profile`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
+      body: JSON.stringify({ email: currentToolsEmail, wipeProscan: true })
+    });
+    const data = await resp.json();
+    if (data.success) { showResult('proscan-result','success','✅ ProScan data cleared'); lookupRep(); }
+    else showResult('proscan-result','error','⚠️ ' + (data.error||'Unknown error'));
+  } catch(e) { showResult('proscan-result','error','⚠️ ' + e.message); }
+}
+
+// ── WIPE ──────────────────────────────────────
+function openWipeConfirm() {
+  if (!currentToolsEmail) return;
+  const checks = ['profile','proscan','accounts','goals'].filter(k => document.getElementById('wipe-'+k)?.checked);
+  if (!checks.length) { alert('Select at least one data type to wipe.'); return; }
+  document.getElementById('wipe-confirm-msg').textContent = `Wipe ${checks.join(', ')} for ${currentToolsEmail}? This cannot be undone.`;
+  document.getElementById('modal-wipe').classList.add('show');
+}
+function closeWipeConfirm() { document.getElementById('modal-wipe').classList.remove('show'); }
+
+async function confirmWipe() {
+  closeWipeConfirm();
+  try {
+    const resp = await fetch(`${API_URL}/admin/wipe-profile`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
+      body: JSON.stringify({
+        email: currentToolsEmail,
+        wipeProfile: document.getElementById('wipe-profile')?.checked || false,
+        wipeProscan: document.getElementById('wipe-proscan')?.checked || false,
+        wipeAccounts: document.getElementById('wipe-accounts')?.checked || false,
+        wipeGoals: document.getElementById('wipe-goals')?.checked || false,
+      })
+    });
+    const data = await resp.json();
+    if (data.success) {
+      showResult('wipe-result','success','✅ Wiped: ' + (data.wiped||[]).join(', '));
+      // Uncheck all boxes
+      ['profile','proscan','accounts','goals'].forEach(k => { const el = document.getElementById('wipe-'+k); if(el) el.checked = false; });
+      lookupRep();
+    } else { showResult('wipe-result','error','⚠️ ' + (data.error||'Unknown error')); }
+  } catch(e) { showResult('wipe-result','error','⚠️ ' + e.message); }
+}
+
+// ── HELPERS ───────────────────────────────────
+function showResult(id, type, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = 'result-box ' + type;
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 6000);
+}
+</script>
+</body>
+</html>
